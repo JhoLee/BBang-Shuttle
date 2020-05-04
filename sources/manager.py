@@ -1,0 +1,281 @@
+import datetime
+import re
+import sys
+import time
+
+from sources.utils import check_os, check_chrome_version, load_webdriver, load_auth_info
+
+ECAMPUS_PATH = {
+    'MAIN': 'https://ecampus.ut.ac.kr',
+    'LECTURE_ROOM': 'https://ecampus.ut.ac.kr/lms/class/courseSchedule/doListView.dunet'
+}
+
+
+class EcampusManager(object):
+
+    def __init__(self, debug=False, show_chrome=False):
+        self.__id = None
+        self.__pw = None
+
+        self.os = check_os()
+        self.version = check_chrome_version()
+
+        self.driver = load_webdriver(show_chrome)
+
+        self.main_window = None
+
+        self.logs = []
+        self.log_level = 2
+
+        self.lecture = None
+        self.courses = None
+
+        self.lectures = []
+        self.courses = []
+
+        if debug:
+            self.log_level = 3
+        else:
+            self.log_level = 2
+
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id(self, value):
+        self.__id = value
+
+    @property
+    def pw(self):
+        return self.__pw
+
+    @pw.setter
+    def pw(self, value):
+        self.__pw = value
+
+    def log(self, message, level='INFO'):
+        LOG_LEVEL = {'NONE': 0, 'WARN': 1, 'INFO': 2, 'DEBUG': 3}
+        if isinstance(level, str):
+            _level = LOG_LEVEL[level.upper()]
+        elif isinstance(level, int):
+            _level = level
+        else:
+            _level = 0
+        if _level <= self.log_level:
+            message = "[{}] {}".format(level, message)
+            self.logs.append(message)
+        print(message)
+
+    def open_page(self, path):
+        self.driver.get(path)
+        window = self.driver.current_window_handle
+
+        return window
+
+    def open_main(self):
+        if self.main_window is not None:
+            self.driver.switch_to.window(self.main_window)
+            time.sleep(1)
+        self.driver.get(ECAMPUS_PATH['MAIN'])
+        time.sleep(3)
+        self.main_window = self.driver.current_window_handle
+
+        self.log("Opened main page.", 'DEBUG')
+
+    def login(self):
+        self.open_main()
+        try:
+            self.logout()
+        except:
+            pass
+
+        self.log("Login... id: {}".format(self.id), 'DEBUG')
+        input_id = self.driver.find_element_by_id('id')
+        input_pw = self.driver.find_element_by_id('pass')
+
+        input_id.send_keys(self.id)
+        input_pw.send_keys(self.pw)
+
+        self.driver.execute_script('login_proc()')
+        time.sleep(11)
+
+        self.log("Hello, {}".format(self.id))
+
+    def logout(self):
+        self.driver.switch_to.window(self.main_window)
+        time.sleep(1)
+
+        self.driver.find_element_by_id('btn_logout').click()
+
+        time.sleep(1)
+        self.log("Logged out.", 'DEBUG')
+
+    def change_display_language(self, lang='english'):
+        self.log("Changing display-language into English for qualified action...", 'debug')
+        time.sleep(1)
+
+        select_lang = self.driver.find_element_by_xpath("//select[@name='lang']/option[text()='ENGLISH']")
+        select_lang.click()
+        time.sleep(5)
+        self.log("Display-language has been changed to {}".format(lang), 'debug')
+
+    def get_lectures(self, year):
+        self.log("Crawling lectures info...", 'DEBUG')
+        self.driver.switch_to.window(self.main_window)
+        time.sleep(3)
+        panel = self.driver.find_element_by_id('selfInfoAfter')
+        lecture_list = panel.find_element_by_class_name('lecInfo')
+
+        self.lectures = lecture_list.find_elements_by_xpath("//a[contains(., '{}')]".format(year))
+        self.log("You have {} lectures to attend!".format(len(self.lectures)), 'info')
+
+    def open_lecture(self, lecture_idx):
+        self.lecture = self.lectures[lecture_idx]
+        lecture_name = self.lecture.text
+        self.log("Opening the lecture room for '{}'.".format(lecture_name), 'DEBUG')
+        self.driver.switch_to.window(self.main_window)
+        time.sleep(1)
+
+        self.lecture.click()
+        time.sleep(3)
+
+        self.driver.get(ECAMPUS_PATH['LECTURE_ROOM'])
+        time.sleep(3)
+
+        self.log("Lecture room for {} was opened.".format(lecture_name), 'DEBUG')
+
+    def get_attendable_courses(self, lecture_idx):
+        self.log("Crawling attendable courses...", 'DEBUG')
+        self.driver.switch_to.window(self.main_window)
+        time.sleep(2)
+
+        self.open_lecture(lecture_idx)
+
+        self.change_display_language('English')
+
+        attendable_courses_link = self.driver.find_elements_by_xpath("//a[contains(., 'Lecture view')]")
+        attendable_courses = [course_link.find_element_by_xpath(".../..") for course_link in attendable_courses_link]
+
+        self.courses = []
+        for course in attendable_courses:
+            datas = course.find_elements_by_tag_name('td')
+
+            title = datas[1].text
+            lecture_time = datas[2].text
+            period = datas[3].text
+            status = datas[4].text
+            link = datas[5].find_element_by_class_name('lectureWindow')
+
+            if status != 'Complete':
+                self.courses.append(
+                    {
+                        'title': title,
+                        'time': int(lecture_time[:-6]),
+                        'period': period,
+                        'status': status,
+                        'link': link,
+                    }
+                )
+
+        self.log("Finished to crawl courses.", 'DEBUG')
+
+        if len(self.courses) == 0:
+            self.log("You don't have any courses to attend in this lecture!")
+        else:
+            self.log("There are {} unattended courses.".format(len(self.courses)))
+            # self.print_courses_info()
+            # TODO: Replace with printing in GUI.
+            # Example
+            """
+            ###########################################
+                title: 'Computer Vision'
+                time: 50 Minutes
+                period: 2020.05.04 ~ 2020.05.08
+                status: not progressed
+                time left: 50 Minutes and 0 Seconds
+            ############################################
+            """
+
+    def attend_course(self, course_idx):
+        self.course = self.courses[course_idx]
+
+        self.log("Opening the course '{}' for {} min {} sec.".format(
+            self.course['title'],
+            self.course['time_left'] // 60 + 2,
+            self.course['time_left'] % 60))
+        self.driver.switch_to.window(self.main_window)
+        time.sleep(2)
+
+        self.attend_time = time.time()
+        self.finish_time = (self.attend_time + self.course['time_left']) + 120
+        finish_time = time.gmtime(self.finish_time)
+        finish_time = "{}:{}".format(finish_time.tm_hour, finish_time.tm_min)
+
+        self.course['link'].click()
+        time.sleep(4)
+
+        self.lecture_window = self.driver.window_handles[-1]
+        self.log("Lecture opened. It will be finished at {}".format(finish_time), 'debug')
+        # TODO: Conver to thread.
+        time.sleep(self.course['time_left'])
+
+        self.driver.switch_to.window(self.lecture_window)
+        time.sleep(3)
+        self.log("Time Over!!", "debug")
+        if len(self.driver.window_handles) > 1:
+            self.driver.close()
+        self.driver.switch_to.window(self.main_window)
+        self.log("Course '{}' finished.".format(self.course.text))
+
+    @staticmethod
+    def extract_progress(status: str):
+        progress = re.findall('\d+', status)
+        if len(progress) > 0:
+            return int(progress[0])
+        else:
+            return 0
+
+    @staticmethod
+    def compute_left_time(lecture_time, progress):
+        time_left = lecture_time * (100 - progress) * 6 // 10
+
+        return time_left
+
+
+class Messages(object):
+
+    def __init__(self, lang='Korean'):
+        self.lang = lang
+
+    def messages(self):
+        messages = {}
+        messages['Korean'] = {
+            'LOGIN': "로그인 되었습니다."
+        }
+        messages['English'] = {
+            'LOGIN: "Logged in.'
+        }
+        return messages[self.lang]
+
+
+if __name__ == "__main__":
+    print("Testing...")
+
+    manager = EcampusManager(debug=True, show_chrome=True)
+
+    sj = 'secrets.json'
+
+    manager.id, manager.pw = load_auth_info(sj)
+    manager.login()
+
+    manager.get_lectures(year=2020)
+    print(manager.lectures)
+    manager.get_attendable_courses(lecture_idx=0)
+    print(manager.courses)
+    if len(manager.courses) > 0:
+        manager.attend_course(course_idx=0)
+    print("Finish.")
+
+    manager.driver.close()
+    sys.exit()
