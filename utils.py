@@ -176,7 +176,7 @@ def get_current_courses(driver, main_window, lec):
 def extract_progress(status):
     progress = re.findall('\d+', status)
     if len(progress) > 0:
-        return progress
+        return int(progress[0])
     else:
         return 0
 
@@ -188,14 +188,15 @@ def compute_left_time(lecture_time, progress):
     :param progress:
     :return:
     """
-    time_left = lecture_time * (100 - progress) * 36
+    time_left = lecture_time * (100 - progress) * 6 // 10
 
     return time_left
 
 
 def print_courses_info(courses):
     for idx, course in enumerate(courses):
-        course['time_left'] = compute_left_time(course['time'], course['status'])
+        progress = extract_progress(course['status'])
+        course['time_left'] = compute_left_time(course['time'], progress)
 
         print("({})".format(idx))
         print("#" * 40)
@@ -222,7 +223,10 @@ def attend_courses(driver, window, courses):
 
 
 def attend_course(driver, window, course):
-    print("[INFO] Opening the course '{}' for {} minutes.".format(course['title'], course['time_left'] + 2))
+    print("[INFO] Opening the course '{}' for {} min {} sec.".format(
+        course['title'],
+        course['time_left'] // 60,
+        course['time_left'] % 60))
     driver.switch_to.window(window)
     time.sleep(0.3)
 
@@ -233,7 +237,7 @@ def attend_course(driver, window, course):
     print("[INFO] It was opened. ")
     # Todo: Compute the ending time...
     print("[INFO] It will be finished at ??:??.")
-    time.sleep((course['time_left']+2) * 60 )
+    time.sleep((course['time_left'] + 2))
     driver.switch_to.window(win_lec)
     time.sleep(2)
     print("[INFO] Time Over!!")
@@ -241,6 +245,7 @@ def attend_course(driver, window, course):
         driver.close()
     driver.switch_to.window(window)
     print("[INFO] Closed the course window.")
+
 
 def log(message, type='INFO'):
     # Todo
