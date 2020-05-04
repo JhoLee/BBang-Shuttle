@@ -72,8 +72,9 @@ def check_chrome_version():
 
 
 def download_driver(current_os, version):
-    if not os.path.exists('src'):
-        os.makedirs('src')
+    # TODO: Modify path to temp path.
+    if not os.path.exists('res'):
+        os.makedirs('res')
     extension = '.exe' if current_os == 'win' else ''
     path = os.path.join('src', 'chromedriver_{}_{}{}'.format(current_os, version, extension))
     if not os.path.exists(path):

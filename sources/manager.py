@@ -78,7 +78,7 @@ class EcampusManager(object):
         else:
             _level = 0
         if _level <= self.log_level:
-            message = "({:%H:%M:%S}) [{}] {}".format(datetime.now(), level, message)
+            message = "({:%H:%M:%S}) [{}] {}".format(datetime.datetime.now(), level, message)
             self.logs.append(message)
         print(message)
 
@@ -173,7 +173,7 @@ class EcampusManager(object):
         self.driver.get(ECAMPUS_PATH['LECTURE_ROOM'])
         time.sleep(3)
 
-        self.log("Lecture room for {} was opened.".format(lecture_name), 'DEBUG')
+        self.log("Lecture room for '{}' was opened.".format(lecture_name), 'DEBUG')
 
     def get_attendable_courses(self, lecture_idx):
         self.log("Crawling attendable courses...", 'DEBUG')
@@ -292,7 +292,7 @@ class Messages(object):
 if __name__ == "__main__":
     print("Testing...")
 
-    manager = EcampusManager(debug=True, show_chrome=True)
+    manager = EcampusManager(debug=True, show_chrome=False)
 
     sj = 'secrets.json'
 
@@ -300,7 +300,14 @@ if __name__ == "__main__":
     manager.login()
 
     manager.get_lectures(year=2020)
-    manager.get_attendable_courses(lecture_idx=0)
+    lecture_range = range(len(manager.lectures))
+
+    choice = int(input("Select the number you want to attend >> "))
+    while choice not in lecture_range:
+        manager.log("Please enter a number in {}~{}".format(0, len(manager.lectures) - 1), 'warn')
+        choice = int(input("Select the number you want >> "))
+
+    manager.get_attendable_courses(lecture_idx=choice)
     if len(manager.courses) > 0:
         manager.attend_course(course_idx=0)
     print("Finish.")
