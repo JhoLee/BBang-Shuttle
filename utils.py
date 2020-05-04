@@ -3,36 +3,51 @@ import json
 import time
 
 from selenium import webdriver
+import platform
 
-#TODO: Seperate into 'utils.py' and 'Auto-attend.py'
+# TODO: Seperate into 'utils.py' and 'Auto-attend.py'
 
 LOG_LEVEL = 0
 # 0: quiet
 # 1: warn
 # 2: warn + info
 # 3: warn + info + save_log_to_log_path
-LOG_PATH = '' 
+LOG_PATH = ''
 
-def load_webdriver(path='src/webdriver', debug=False):
-    if not os.path.exists(path):
-        message = "You must download the chrome webdriver for your chrome version."
-        message += "\n\tVisit the page and download the driver...; https://chromedriver.chromium.org/downloads"
-        raise FileNotFoundError(message)
+OS_LIST = {'Darwin': 'mac', 'Windows': 'win', 'Linux': 'lin'}
+VER_LIST = ['80', '81', '83']
+
+
+def __get_driver_path(current_os, version):
+    return os.path.join('src', 'chromedriver_{}_{}'.format(current_os, version))
+
+
+def load_webdriver(debug=False):
+    current_os = OS_LIST[platform.system()]
 
     options = webdriver.ChromeOptions()
 
-    if debug:
-        options.add_argument('headless')
-        options.add_argument('window-size=1920x1080')
-        options.add_argument('disable-gpu')
+    driver = None
 
-    try:
-        driver = webdriver.Chrome(path, chrome_options=options)
-    except OSError:
-        message = "Something wrong. Check your driver version."
-        message += "\n\tYou should match your driver version and chrome's version."
-        message += "\n\tMore help; https://chromedriver.chromium.org/downloads"
-        raise SystemError(message)
+    for ver in VER_LIST:
+        _path = __get_driver_path(current_os, ver)
+        driver = _load_driver(driver, _path, options, debug)
+
+    return driver
+
+
+def _load_driver(driver, _path, options, debug=False):
+    if driver is None:
+        if not debug:
+            options.add_argument('headless')
+            options.add_argument('window-size=1920x1080')
+            options.add_argument('disable-gpu')
+
+        try:
+            driver = webdriver.Chrome(_path, chrome_options=options)
+        except:
+            print("[DEBUG] Not match. Re-loading with another version.")
+            driver = None
 
     return driver
 
@@ -206,7 +221,7 @@ def log(message, type='INFO'):
 if __name__ == "__main__":
     # TODO: Use argparser
 
-    driver = load_webdriver('src/chromedriver', debug=True)
+    driver = load_webdriver(debug=False)
     driver.implicitly_wait(3)
     main_window = open_page(driver, 'https://ecampus.ut.ac.kr')
 
