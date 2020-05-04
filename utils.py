@@ -3,6 +3,8 @@ import json
 import re
 import time
 
+from requests import get
+
 from selenium import webdriver
 import platform
 
@@ -18,9 +20,16 @@ LOG_PATH = ''
 OS_LIST = {'Darwin': 'mac', 'Windows': 'win', 'Linux': 'lin'}
 VER_LIST = ['80', '81', '83']
 
+def download_driver_path(current_os, version):
+    path = os.path.join('src', 'chromedriver_{}_{}'.format(current_os, version))
 
-def __get_driver_path(current_os, version):
-    return os.path.join('src', 'chromedriver_{}_{}'.format(current_os, version))
+    url = 'http://bit.ly/chrome_{}_{}'.format(
+        current_os, version)
+    with open(path, 'wb') as f:
+        response = get(url)
+        f.write(response.content)
+
+    return path
 
 
 def load_webdriver(debug=False):
@@ -31,7 +40,7 @@ def load_webdriver(debug=False):
     driver = None
 
     for ver in VER_LIST:
-        _path = __get_driver_path(current_os, ver)
+        _path = download_driver_path(current_os, ver)
         driver = _load_driver(driver, _path, options, debug)
 
     return driver
