@@ -1,5 +1,5 @@
-import json
 import os
+import json
 import time
 
 from selenium import webdriver
@@ -57,6 +57,7 @@ def login(driver, main_window, _id, _pw):
     except:
         pass
 
+    print("[INFO] Login... id:", _id)
     input_id = driver.find_element_by_id('id')
     input_pw = driver.find_element_by_id('pass')
 
@@ -65,8 +66,9 @@ def login(driver, main_window, _id, _pw):
 
     # Login
     driver.execute_script('login_proc()')
-    time.sleep(3)
+    driver.implicitly_wait(13)
 
+    print("[INFO] Hello,", _id)
 
 def logout(driver, main_window):
     driver.switch_to.window(main_window)
@@ -77,6 +79,7 @@ def logout(driver, main_window):
 
 
 def get_lectures(driver, main_window, year):
+    print("[INFO] Crawling lectures info...")
     driver.switch_to.window(main_window)
     time.sleep(0.3)
     panel = driver.find_element_by_id('selfInfoAfter')
@@ -144,7 +147,10 @@ def get_current_courses(driver, main_window, lec):
 
 def print_courses_info(courses):
     for idx, course in enumerate(courses):
-        time_left = course['time'] * (100 - int(course['status'][12:14])) // 100
+        if course['status'] != 'not progressed':
+            time_left = course['time'] * (100 - int(course['status'][12:14])) // 100
+        else:
+            time_left = course['time']
 	
         course['time_left'] = time_left
 
@@ -154,7 +160,7 @@ def print_courses_info(courses):
         print("\ttime:", course['time'], 'Minutes')
         print("\tperiod:", course['period'].replace('\n', ' '))
         print("\tstatus:", course['status'])
-        print("\ttime left: about", course['time_left'] + 1, 'Minutes')
+        print("\ttime left: about", course['time_left'], 'Minutes')
         print("#" * 40)
         print()
 
