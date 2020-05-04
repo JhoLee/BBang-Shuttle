@@ -1,8 +1,6 @@
 # 빵셔틀 
 [교통대 이캠퍼스](https://ecampus.ut.ac.kr) 자동 출석체크 및 강의 영상 다운로더
-  
-  
-*Named by [@YongSiHun](https://github.com/YongSiHun)*  
+ 
 
 ## 현재 가능한 기능
  - e-campus 로그인
