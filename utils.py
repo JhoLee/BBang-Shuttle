@@ -1,7 +1,10 @@
 import os
 import json
 import re
+import subprocess
 import time
+
+from requests import get
 
 from selenium import webdriver
 import platform
@@ -18,9 +21,21 @@ LOG_PATH = ''
 OS_LIST = {'Darwin': 'mac', 'Windows': 'win', 'Linux': 'lin'}
 VER_LIST = ['80', '81', '83']
 
+def download_driver_path(current_os, version):
+    if not os.path.exists('src'):
+        os.makedirs('src')
+    extension = '.exe' if current_os == 'win' else ''
+    path = os.path.join('src', 'chromedriver_{}_{}{}'.format(current_os, version, extension))
+    if not os.path.exists(path):
+        print("[INFO] Downloading driver from dropbox...", current_os, version)
+        url = 'http://bit.ly/cd_{}_{}'.format(
+            current_os, version)
+        with open(path, 'wb') as f:
+            response = get(url)
+            f.write(response.content)
+        subprocess.call(['chmod', '0755', path])
 
-def __get_driver_path(current_os, version):
-    return os.path.join('src', 'chromedriver_{}_{}'.format(current_os, version))
+    return path
 
 
 def load_webdriver(debug=False):
@@ -31,7 +46,7 @@ def load_webdriver(debug=False):
     driver = None
 
     for ver in VER_LIST:
-        _path = __get_driver_path(current_os, ver)
+        _path = download_driver_path(current_os, ver)
         driver = _load_driver(driver, _path, options, debug)
 
     return driver
@@ -45,11 +60,12 @@ def _load_driver(driver, _path, options, debug=False):
             options.add_argument('disable-gpu')
 
         try:
-            driver = webdriver.Chrome(_path, chrome_options=options)
+            driver = webdriver.Chrome(executable_path=_path, chrome_options=options)
         except:
-            print("[DEBUG] Not match. Re-loading with another version.")
+            print("[DEBUG] Not match. Re-loading with another version.", _path)
             driver = None
 
+        print(driver)
     return driver
 
 

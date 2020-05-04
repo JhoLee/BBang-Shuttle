@@ -1,10 +1,15 @@
 appnope==0.1.0
 attrs==19.3.0
 backcall==0.1.0
+beautifulsoup4==4.9.0
 bleach==3.1.5
+bs4==0.0.1
+certifi==2020.4.5.1
+chardet==3.0.4
 decorator==4.4.2
 defusedxml==0.6.0
 entrypoints==0.3
+idna==2.9
 importlib-metadata==1.6.0
 ipykernel==5.2.1
 ipython==7.14.0
@@ -38,9 +43,11 @@ python-dateutil==2.8.1
 pyzmq==19.0.0
 qtconsole==4.7.3
 QtPy==1.9.0
+requests==2.23.0
 selenium==3.141.0
 Send2Trash==1.5.0
 six==1.14.0
+soupsieve==2.0
 terminado==0.8.3
 testpath==0.4.4
 tornado==6.0.4
