@@ -13,7 +13,13 @@ ECAMPUS_PATH = {
 
 class EcampusManager(object):
 
+
     def __init__(self, debug=False, show_chrome=False):
+        """
+
+        :param debug:
+        :param show_chrome:
+        """
         self.__id = None
         self.__pw = None
 
@@ -55,6 +61,15 @@ class EcampusManager(object):
         self.__pw = value
 
     def log(self, message, level='INFO'):
+        """
+        Push messages into a list(queue).
+        self.log_level define how deep to show.
+        :param message: message to log.
+        :param level: log level
+        :type message: str
+        :type level: str or int
+        """
+
         LOG_LEVEL = {'NONE': 0, 'WARN': 1, 'INFO': 2, 'DEBUG': 3}
         if isinstance(level, str):
             _level = LOG_LEVEL[level.upper()]
@@ -63,7 +78,7 @@ class EcampusManager(object):
         else:
             _level = 0
         if _level <= self.log_level:
-            message = "[{}] {}".format(level, message)
+            message = "({:%H:%M:%S}) [{}] {}".format(datetime.now(), level, message)
             self.logs.append(message)
         print(message)
 
@@ -74,6 +89,10 @@ class EcampusManager(object):
         return window
 
     def open_main(self):
+        """
+        Open main page (https://ecampus.ut.ac.kr)
+        After open, save this winodw to self.main_window
+        """
         if self.main_window is not None:
             self.driver.switch_to.window(self.main_window)
             time.sleep(1)
@@ -84,6 +103,9 @@ class EcampusManager(object):
         self.log("Opened main page.", 'DEBUG')
 
     def login(self):
+        """
+        Login with self.id, self.pw
+        """
         self.open_main()
         try:
             self.logout()
@@ -112,6 +134,10 @@ class EcampusManager(object):
         self.log("Logged out.", 'DEBUG')
 
     def change_display_language(self, lang='english'):
+        """
+        Change display-language into English to find elements by text.
+        :param lang:
+        """
         self.log("Changing display-language into English for qualified action...", 'debug')
         time.sleep(1)
 
@@ -121,6 +147,10 @@ class EcampusManager(object):
         self.log("Display-language has been changed to {}".format(lang), 'debug')
 
     def get_lectures(self, year):
+        """
+        Get lecture list from panel, and save them to self.lectures
+        :param year: A keyword to find lecture.
+        """
         self.log("Crawling lectures info...", 'DEBUG')
         self.driver.switch_to.window(self.main_window)
         time.sleep(3)
@@ -270,9 +300,7 @@ if __name__ == "__main__":
     manager.login()
 
     manager.get_lectures(year=2020)
-    print(manager.lectures)
     manager.get_attendable_courses(lecture_idx=0)
-    print(manager.courses)
     if len(manager.courses) > 0:
         manager.attend_course(course_idx=0)
     print("Finish.")
