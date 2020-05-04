@@ -75,10 +75,22 @@ class Ui_Main(object):
         if not dlg_lectures.is_clicked_start:
             exit(-2)
 
-        lecture = lectures[selected_lecture_index]
-        courses = get_current_courses(driver, h_web_page, lecture)
-        attend_courses(driver, h_web_page, courses)
-        driver.close()
+        # Todo: Generate manager instance in main.py not in login.py
+        self.manager = dlg_login.manager
+        self.manager.get_attendable_courses(selected_lecture_index)
+        # self.manager.courses == courses
+        for course in self.manager.courses:
+            self.manager.attend_course(course)
+
+        self.manager.log("Finish", 'info')
+
+#
+        # while len(self.manager.logs) > 0:
+        #     print_to_gui(self.manager.logs.pop(0))
+#
+
+
+        self.manager.driver.close()
 
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
+from manager import EcampusManager
 
 APP_VERSION = 0.1
 
@@ -13,6 +14,7 @@ from PyQt5.Qt import QMessageBox, QSize, QIcon
 from PyQt5.QtWidgets import QDialog
 from main import show_messagebox
 from utils import *
+
 
 class Ui_Login(QDialog):
     def __init__(self):
@@ -78,7 +80,8 @@ class Ui_Login(QDialog):
         font.setFamily("Malgun Gothic")
         font.setPointSize(10)
         self.label_3.setFont(font)
-        self.label_3.setText("<html><head/><body><p align=\"justify\">&nbsp;본 프로그램의 사용으로 야기되는 어떠한 긍정적, 부정적 결과에 대해서도 제작자는 그 책임을 지지 않습니다.</p><p align=\"justify\">&nbsp;본 프로그램은 사용자 입력 정보에 대한 어떠한 정보도 학교 서버외의 원격지로 전송하거나 수집하지 않습니다.</p></body></html>")
+        self.label_3.setText(
+            "<html><head/><body><p align=\"justify\">&nbsp;본 프로그램의 사용으로 야기되는 어떠한 긍정적, 부정적 결과에 대해서도 제작자는 그 책임을 지지 않습니다.</p><p align=\"justify\">&nbsp;본 프로그램은 사용자 입력 정보에 대한 어떠한 정보도 학교 서버외의 원격지로 전송하거나 수집하지 않습니다.</p></body></html>")
         self.label_3.setAlignment(QtCore.Qt.AlignCenter)
         self.label_3.setWordWrap(True)
         self.label_3.setObjectName("label_3")
@@ -112,18 +115,22 @@ class Ui_Login(QDialog):
             if self.edit_id.text() == '' or self.edit_pw.text() == '':
                 show_messagebox('로그인 정보를 입력하십시오.', '경고', QMessageBox.Warning)
             else:
-                self.driver, self.h_web_page, self.lectures = self.login()
+                manager = self.login()
+                self.driver, self.h_web_page, self.lectures = manager.driver, manager.main_window, manager.lectures
                 self.close()
         else:
             self.show_messagebox('계속 진행하려면 라이선스에 동의해야합니다.', '경고', QMessageBox.Warning)
 
     def login(self):
-        driver = load_webdriver(debug=False)
-        driver.implicitly_wait(3)
-        h_web_page = open_page(driver, 'https://ecampus.ut.ac.kr')
-        login(driver, h_web_page, self.edit_id, self.edit_pw)
-        lectures = get_lectures(driver, h_web_page, year=2020)
-        return driver, h_web_page, lectures
+        manager = EcampusManager(debug=True, show_chrome=False)
+
+        manager.id = self.edit_id.text()
+        manager.pw = self.edit_pw.text()
+        manager.login()
+
+        manager.get_lectures(year=2020)
+
+        return manager
 
     @staticmethod
     def show_messagebox(message, title, icon=QMessageBox.Information):
