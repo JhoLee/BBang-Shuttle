@@ -11,12 +11,14 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QMessageBox
 from PyQt5.QtWidgets import QDialog
 from main import show_messagebox
+from utils import *
 
 class Ui_Login(QDialog):
     def __init__(self):
         super().__init__()
-        self.pw = None
-        self.id = None
+        self.lectures = None
+        self.driver = None
+        self.h_web_page = None
 
     def setupUi(self):
         self.setObjectName("self")
@@ -41,7 +43,7 @@ class Ui_Login(QDialog):
         self.btn_login.setGeometry(QtCore.QRect(170, 250, 91, 31))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
-        font.setPointSize(12)
+        font.setPointSize(10)
         self.btn_login.setFont(font)
         # self.btn_login.setObjectName("btn_login")
         self.chk_license = QtWidgets.QCheckBox(self)
@@ -92,13 +94,23 @@ class Ui_Login(QDialog):
         self.btn_login.clicked.connect(self.check_validation)
 
     def check_validation(self):
+        self.btn_login.setText("로그인 중...")
         if self.chk_license.isChecked():
             if self.edit_id.text() == '' or self.edit_pw.text() == '':
                 show_messagebox('로그인 정보를 입력하십시오.', '경고', QMessageBox.Warning)
             else:
+                self.driver, self.h_web_page, self.lectures = self.login()
                 self.close()
         else:
             self.show_messagebox('계속 진행하려면 라이선스에 동의해야합니다.', '경고', QMessageBox.Warning)
+
+    def login(self):
+        driver = load_webdriver(debug=False)
+        driver.implicitly_wait(3)
+        h_web_page = open_page(driver, 'https://ecampus.ut.ac.kr')
+        login(driver, h_web_page, '20029701', 'Cyzhvkdl4$')# self.edit_id, self.edit_pw)
+        lectures = get_lectures(driver, h_web_page, year=2020)
+        return driver, h_web_page, lectures
 
     @staticmethod
     def show_messagebox(message, title, icon=QMessageBox.Information):
