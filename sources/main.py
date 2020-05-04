@@ -8,8 +8,9 @@
 
 import sys
 from PyQt5.Qt import QSize, QIcon
-from PyQt5 import QtCore, QtWidgets
-from PyQt5.QtWidgets import QMessageBox
+from PyQt5 import QtCore, QtWidgets, QtGui
+from PyQt5.QtWidgets import QMessageBox, QMainWindow
+from PyQt5.QtWidgets import QWidget
 from utils import *
 
 
@@ -27,24 +28,62 @@ def show_messagebox(message, title, icon=QMessageBox.Information):
 
 class Ui_Main(object):
     def __init__(self):
+        #super().__init__()
         self.id = None
         self.pw = None
+        self.manager = None
+        self.selected_lecture_index = None
+        self.dlg_login = None
+        self.lecture_selected = None
 
-    def setupUi(self, _wnd_main):
-        _wnd_main.setObjectName("Main")
-        _wnd_main.resize(531, 332)
-        _wnd_main.setFixedSize(QSize(531, 332))
-        _wnd_main.setWindowIcon(QIcon('../resources/main.ico'))
-        self.centralwidget = QtWidgets.QWidget(_wnd_main)
+    def setupUi(self, mainwindow):
+
+        mainwindow.setObjectName("Main")
+        mainwindow.resize(531, 312)
+        mainwindow.setFixedSize(QSize(531, 312))
+        mainwindow.setWindowIcon(QIcon('../resources/main.ico'))
+        self.centralwidget = QtWidgets.QWidget(mainwindow)
         self.centralwidget.setObjectName("centralwidget")
-        _wnd_main.setCentralWidget(self.centralwidget)
-        self.statusbar = QtWidgets.QStatusBar(_wnd_main)
+
+        self.statusbar = QtWidgets.QStatusBar(mainwindow)
         self.statusbar.setObjectName("statusbar")
-        _wnd_main.setStatusBar(self.statusbar)
+        # _wnd_main.setStatusBar(self.statusbar)
+
+        self.lst_logs = QtWidgets.QListWidget(self.centralwidget)
+        self.lst_logs.setGeometry(QtCore.QRect(10, 10, 511, 251))
+        self.lst_logs.setObjectName("lst_lectures")
+        self.label_4 = QtWidgets.QLabel(self.centralwidget)
+        self.label_4.setGeometry(QtCore.QRect(10, 270, 271, 41))
+        font = QtGui.QFont()
+        font.setFamily("Malgun Gothic")
+        font.setPointSize(10)
+        self.label_4.setFont(font)
+        self.label_4.setText("<html><head/><body><p align=\"center\"><span style=\" font-size:8pt;\">Version: 0.1 Powered by Chromedriver<br/>ⓒ 2020 @JhoLee, @cr3ux53c. All rights reserved.</span></p></body></html>")
+        self.label_4.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_4.setWordWrap(True)
+        self.label_4.setObjectName("label_4")
+        # self.btn_close = QtWidgets.QPushButton(self.centralwidget)
+        # self.btn_close.setGeometry(QtCore.QRect(380, 270, 141, 31))
+        font = QtGui.QFont()
+        font.setFamily("Malgun Gothic")
+        font.setPointSize(10)
+        # self.btn_close.setFont(font)
+        # self.btn_close.setObjectName("btn_close")
+        self.btn_start = QtWidgets.QPushButton(self.centralwidget)
+        self.btn_start.setText("수강 시작")
+        self.btn_start.clicked.connect(self.start)
+        self.btn_start.setGeometry(QtCore.QRect(290, 270, 71, 31))
+        font = QtGui.QFont()
+        font.setFamily("Malgun Gothic")
+        font.setPointSize(10)
+        self.btn_start.setFont(font)
 
         _translate = QtCore.QCoreApplication.translate
-        _wnd_main.setWindowTitle(_translate("Main", "MainWindow"))
-        QtCore.QMetaObject.connectSlotsByName(_wnd_main)
+        # _wnd_main.setWindowTitle(_translate("Main", "MainWindow"))
+        # self.btn_close.setText("수강 중지 및 로그아웃")
+        # self.btn_close.clicked.connect(self.close)
+        mainwindow.setCentralWidget(self.centralwidget)
+        QtCore.QMetaObject.connectSlotsByName(mainwindow)
 
         # Open login dialog first
         from sources.login import Ui_Login
@@ -55,47 +94,57 @@ class Ui_Main(object):
         driver = dlg_login.driver
         h_web_page = dlg_login.h_web_page
         # Get lecture information
+        self.dlg_login = dlg_login
         lectures = dlg_login.lectures
         if lectures is None:
-            exit()
+            exit(-3)
 
         from sources.lectures import Ui_Lectures
         dlg_lectures = Ui_Lectures(lectures)
         dlg_lectures.setupUi()
         dlg_lectures.exec()
 
-        selected_lecture_index = None
+        self.selected_lecture_index = None
         for index in range(dlg_lectures.lst_lectures.count()):
             if dlg_lectures.lst_lectures.item(index).isSelected():
-                selected_lecture_index = index
+                self.selected_lecture_index = index
                 break
-        if selected_lecture_index is None:
+        if self.selected_lecture_index is None:
             exit(-1)
 
-        if not dlg_lectures.is_clicked_start:
+        if not dlg_lectures.is_clicked_selection:
             exit(-2)
 
+        self.lecture_selected = lectures[self.selected_lecture_index]
+
         # Todo: Generate manager instance in main.py not in login.py
-        self.manager = dlg_login.manager
-        self.manager.get_attendable_courses(selected_lecture_index)
-        # self.manager.courses == courses
-        for course in self.manager.courses:
-            self.manager.attend_course(course)
+        # self.manager = dlg_login.manager
+        # self.manager.get_attendable_courses(selected_lecture_index)
+        # # self.manager.courses == courses
+        # for course in self.manager.courses:
+        #     self.manager.attend_course(course)
+        #
+        # self.manager.log("Finish", 'info')
+        #
+        # # while len(self.manager.logs) > 0:
+        # #     print_to_gui(self.manager.logs.pop(0))
+        #
+        # self.manager.driver.close()
 
-        self.manager.log("Finish", 'info')
+    def start(self):
+        self.btn_start.setEnabled(False)
+        courses = get_current_courses(self.dlg_login.driver, self.dlg_login.h_web_page, self.lecture_selected)
+        attend_courses(self.dlg_login.driver, self.dlg_login.h_web_page, courses)
+        driver.close()
 
-#
-        # while len(self.manager.logs) > 0:
-        #     print_to_gui(self.manager.logs.pop(0))
-#
-
-
-        self.manager.driver.close()
+    def close(self):
+        self.close()
 
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    wnd_main = QtWidgets.QMainWindow()
-    Ui_Main().setupUi(wnd_main)
-    wnd_main.show()
+    wnd_main = Ui_Main()
+    mainwindow = QMainWindow()
+    wnd_main.setupUi(mainwindow)
+    mainwindow.show()
     sys.exit(app.exec_())
