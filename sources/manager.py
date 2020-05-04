@@ -23,21 +23,27 @@ class EcampusManager(object):
         self.__id = None
         self.__pw = None
 
+        # system
         self.os = check_os()
         self.version = check_chrome_version()
 
+        # selenium
         self.driver = load_webdriver(show_chrome)
-
         self.main_window = None
 
-        self.logs = []
-        self.log_level = 2
+        # list
+        self.lectures = []
+        self.courses = []
 
+        # current status
         self.lecture = None
         self.courses = None
 
-        self.lectures = []
-        self.courses = []
+        # log
+        self.logs = []
+        self.log_level = 2
+        self.language = 'KOREAN'
+        self.msg = self.message()
 
         if debug:
             self.log_level = 3
@@ -112,7 +118,7 @@ class EcampusManager(object):
         except:
             pass
 
-        self.log("Login... id: {}".format(self.id), 'DEBUG')
+        self.log("{} ID: {}".format(self.msg['LOGIN_TRY'], self.id), 'DEBUG')
         input_id = self.driver.find_element_by_id('id')
         input_pw = self.driver.find_element_by_id('pass')
 
@@ -122,7 +128,7 @@ class EcampusManager(object):
         self.driver.execute_script('login_proc()')
         time.sleep(11)
 
-        self.log("Hello, {}".format(self.id))
+        self.log("{}, {}".format(self.msg['HELLO'], self.id))
 
     def logout(self):
         self.driver.switch_to.window(self.main_window)
@@ -131,7 +137,7 @@ class EcampusManager(object):
         self.driver.find_element_by_id('btn_logout').click()
 
         time.sleep(1)
-        self.log("Logged out.", 'DEBUG')
+        self.log("{}".format(self.msg['LOGOUT_SUCCESS']), 'DEBUG')
 
     def change_display_language(self, lang='english'):
         """
@@ -158,7 +164,7 @@ class EcampusManager(object):
         lecture_list = panel.find_element_by_class_name('lecInfo')
 
         self.lectures = lecture_list.find_elements_by_xpath("//a[contains(., '{}')]".format(year))
-        self.log("You have {} lectures to attend!".format(len(self.lectures)), 'info')
+        self.log("{} {}".format(self.msg['COURSES_TO_ATTEND'], len(self.lectures)), 'info')
 
     def open_lecture(self, lecture_idx):
         self.lecture = self.lectures[lecture_idx]
@@ -256,7 +262,7 @@ class EcampusManager(object):
         if len(self.driver.window_handles) > 1:
             self.driver.close()
         self.driver.switch_to.window(self.main_window)
-        self.log("Course '{}' finished.".format(self.course.text))
+        self.log("{} '{}'".format(self.msg['COURSE_END'], self.course.text), 'info')
 
     @staticmethod
     def extract_progress(status: str):
@@ -272,22 +278,43 @@ class EcampusManager(object):
 
         return time_left
 
+    def message(self):
+        language_order = {'KOREAN': 0, 'ENGLISH': 1}
+        _lang = language_order[self.language]
 
-class Messages(object):
+        messages = {
+            'LOGIN_TRY': [
+                "로그인 시도중...",
+                "Loggin in..."
+            ],
+            'LOGIN_SUCCESS': [
+                "로그인 되었습니다.",
+                "Logged in.",
+            ],
+            'LOGOUT_SUCCESS': [
+                "로그아웃 되었습니다.",
+                "Logout success.",
+            ],
+            'HELLO': [
+                "안녕하세요",
+                "Hello",
+            ],
+            'COURSES_TO_ATTEND': [
+                "출석해야 하는 강의 수:",
+                "Courses to attend:"
+            ],
+            'COURSE_END': [
+                "강의가 끝났습니다.",
+                "Course ended.",
+            ],
 
-    def __init__(self, lang='Korean'):
-        self.lang = lang
 
-    def messages(self):
-        messages = {}
-        messages['Korean'] = {
-            'LOGIN': "로그인 되었습니다."
+
         }
-        messages['English'] = {
-            'LOGIN: "Logged in.'
-        }
-        return messages[self.lang]
 
+        messages = {key: message[_lang] for key, message in messages.items()}
+
+        return messages
 
 if __name__ == "__main__":
     print("Testing...")
