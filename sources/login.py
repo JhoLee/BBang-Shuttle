@@ -121,7 +121,7 @@ class Ui_Login(QDialog):
         driver = load_webdriver(debug=False)
         driver.implicitly_wait(3)
         h_web_page = open_page(driver, 'https://ecampus.ut.ac.kr')
-        login(driver, h_web_page, '20029701', 'Cyzhvkdl4$')# self.edit_id, self.edit_pw)
+        login(driver, h_web_page, self.edit_id.text(), self.edit_pw.text())
         lectures = get_lectures(driver, h_web_page, year=2020)
         return driver, h_web_page, lectures
 

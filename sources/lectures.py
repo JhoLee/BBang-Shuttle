@@ -21,7 +21,7 @@ class Ui_Lectures(QDialog):
         self.items = QStandardItemModel()
         self.setFixedSize(QSize(272, 200))
         self.setWindowIcon(QIcon('../resources/lectures.ico'))
-        self.is_clicked_start = False
+        self.is_clicked_selection = False
 
     def setupUi(self):
         self.setObjectName("Lectures")
@@ -33,13 +33,13 @@ class Ui_Lectures(QDialog):
         font.setPointSize(10)
         self.lst_lectures.setFont(font)
         self.lst_lectures.setObjectName("lst_lectures")
-        self.btn_start = QtWidgets.QPushButton(self)
-        self.btn_start.setGeometry(QtCore.QRect(180, 160, 81, 31))
+        self.btn_select_subject = QtWidgets.QPushButton(self)
+        self.btn_select_subject.setGeometry(QtCore.QRect(180, 160, 81, 31))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
         font.setPointSize(10)
-        self.btn_start.setFont(font)
-        self.btn_start.setObjectName("btn_start")
+        self.btn_select_subject.setFont(font)
+        self.btn_select_subject.setObjectName("btn_start")
         self.label_3 = QtWidgets.QLabel(self)
         self.label_3.setGeometry(QtCore.QRect(10, 10, 251, 16))
         font = QtGui.QFont()
@@ -53,7 +53,7 @@ class Ui_Lectures(QDialog):
 
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("Lectures", "Dialog"))
-        self.btn_start.setText(_translate("Lectures", "수강 시작"))
+        self.btn_select_subject.setText(_translate("Lectures", "과목 선택"))
         self.setWindowTitle(_translate("Login", "수강과목 선택 :: 한국교통대학교 e-Campus 출석체크"))
 
         # self.items = QStandardItemModel()
@@ -66,8 +66,8 @@ class Ui_Lectures(QDialog):
 
         QtCore.QMetaObject.connectSlotsByName(self)
 
-        self.btn_start.clicked.connect(self.start)
+        self.btn_select_subject.clicked.connect(self.select)
 
-    def start(self):
-        self.is_clicked_start = True
+    def select(self):
+        self.is_clicked_selection = True
         self.close()
