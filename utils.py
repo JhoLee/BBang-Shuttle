@@ -85,12 +85,23 @@ def login(driver, main_window, _id, _pw):
 
     print("[INFO] Hello,", _id)
 
+
 def logout(driver, main_window):
     driver.switch_to.window(main_window)
     time.sleep(0.5)
     btn_logout = driver.find_element_by_id('btn_logout')
     btn_logout.click()
     time.sleep(0.5)
+
+
+def change_display_language(driver, main_window, lang='english'):
+    driver.switch_to.window(main_window)
+    print("[INFO] Changing display-lanuage into English for qualified searching...")
+    time.sleep(0.5)
+    select_lang = driver.find_element_by_xpath("//select[@name='lang']/option[text()='ENGLISH']")
+    select_lang.click()
+    time.sleep(5)
+    print("[INFO] Display-lanuage has been changed to English.")
 
 
 def get_lectures(driver, main_window, year):
@@ -128,11 +139,12 @@ def get_current_courses(driver, main_window, lec):
     time.sleep(0.3)
     open_lecture_room(driver, main_window, lec)
 
-    courses = []
+    change_display_language(driver, main_window, 'ENGLISH')
 
     current_courses_link = driver.find_elements_by_xpath("//a[contains(., 'Lecture view')]")
     current_courses = [course_link.find_element_by_xpath("../..") for course_link in current_courses_link]
 
+    courses = []
     for course in current_courses:
         datas = course.find_elements_by_tag_name('td')
         title = datas[1].text
@@ -166,7 +178,6 @@ def print_courses_info(courses):
             time_left = course['time'] * (100 - int(course['status'][12:14])) // 100
         else:
             time_left = course['time']
-	
         course['time_left'] = time_left
 
         print("({})".format(idx))
