@@ -2,6 +2,7 @@ import os
 import json
 import re
 import subprocess
+import sys
 import time
 
 from requests import get
@@ -21,7 +22,56 @@ LOG_PATH = ''
 OS_LIST = {'Darwin': 'mac', 'Windows': 'win', 'Linux': 'lin'}
 VER_LIST = ['80', '81', '83']
 
-def download_driver_path(current_os, version):
+
+def check_os():
+    current_os = OS_LIST[platform.system()]
+
+    print("[INFO] OS:", current_os)
+    return current_os
+
+
+def check_chrome_version():
+    print("[INFO] Checking your chorme's version...")
+    current_os = check_os()
+    if current_os == 'win':
+        import winreg as reg
+
+        key = reg.HKEY_CURRENT_USER
+        key_value = "Software\\Google\\Chrome\\BLBeacon"
+        try:
+            val_key = reg.OpenKey(key, key_value, 0, reg.KEY_ALL_ACCESS)
+            idx = 0
+            n, v, t = reg.EnumValue(val_key, idx)
+            while n != 'version':
+                n, v, t = reg.EnumValue(val_key, idx)
+
+            version = v.split('.')[0]
+
+        except:
+            version = '80'
+            print("[WARN] Chrome was not found...")
+
+    elif current_os == 'mac':
+        try:
+            chrome_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
+            version_info = subprocess.Popen([chrome_path, '--version'], stdout=subprocess.PIPE).stdout.read()
+
+            version = re.findall('\d+', str(version_info))
+            version = version[0]
+        except:
+            version = '80'
+            print("[WARN] Chrome was not found... ")
+
+    else:
+        version = '81'
+        print("[WARN] Linux could not be supported... ")
+
+    print("[INFO] Chrome version:", version)
+
+    return version
+
+
+def download_driver(current_os, version):
     if not os.path.exists('src'):
         os.makedirs('src')
     extension = '.exe' if current_os == 'win' else ''
@@ -34,20 +84,29 @@ def download_driver_path(current_os, version):
             response = get(url)
             f.write(response.content)
         subprocess.call(['chmod', '0755', path])
+    else:
+        print("[INFO] Driver exists. ")
 
     return path
 
 
 def load_webdriver(debug=False):
-    current_os = OS_LIST[platform.system()]
+    current_os = check_os()
+
+    chrome_version = check_chrome_version()
 
     options = webdriver.ChromeOptions()
 
     driver = None
 
-    for ver in VER_LIST:
-        _path = download_driver_path(current_os, ver)
+    if current_os == 'win' or current_os == 'mac':
+        _path = download_driver(current_os, chrome_version)
         driver = _load_driver(driver, _path, options, debug)
+
+    else:
+        for ver in VER_LIST:
+            _path = download_driver(current_os, ver)
+            driver = _load_driver(driver, _path, options, debug)
 
     return driver
 
@@ -295,3 +354,4 @@ if __name__ == "__main__":
     attend_courses(driver, main_window, courses)
 
     driver.close()
+    sys.exit(0)
