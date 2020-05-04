@@ -10,7 +10,7 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QMessageBox
 from PyQt5.QtWidgets import QDialog
-
+from main import show_messagebox
 
 class Ui_Login(QDialog):
     def __init__(self):
@@ -93,7 +93,10 @@ class Ui_Login(QDialog):
 
     def check_validation(self):
         if self.chk_license.isChecked():
-            self.close()
+            if self.edit_id.text() == '' or self.edit_pw.text() == '':
+                show_messagebox('로그인 정보를 입력하십시오.', '경고', QMessageBox.Warning)
+            else:
+                self.close()
         else:
             self.show_messagebox('계속 진행하려면 라이선스에 동의해야합니다.', '경고', QMessageBox.Warning)
 

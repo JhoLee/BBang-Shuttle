@@ -22,10 +22,10 @@ OS_LIST = {'Darwin': 'mac', 'Windows': 'win', 'Linux': 'lin'}
 VER_LIST = ['80', '81', '83']
 
 def download_driver_path(current_os, version):
-    if not os.path.exists('src'):
-        os.makedirs('src')
+    if not os.path.exists('../src'):
+        os.makedirs('../src')
     extension = '.exe' if current_os == 'win' else ''
-    path = os.path.join('src', 'chromedriver_{}_{}{}'.format(current_os, version, extension))
+    path = os.path.join('../src', 'chromedriver_{}_{}{}'.format(current_os, version, extension))
     if not os.path.exists(path):
         print("[INFO] Downloading driver from dropbox...", current_os, version)
         url = 'http://bit.ly/cd_{}_{}'.format(
