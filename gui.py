@@ -7,8 +7,8 @@ from ui.main import Ui_Main
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
-    Dialog = QtWidgets.QDialog()
-    ui = Ui_Login()
-    ui.setupUi(Dialog)
-    Dialog.show()
-    sys.exit(app.exec_())
+    Main = QtWidgets.QMainWindow()
+    main = Ui_Main()
+    main.setupUi(Main)
+    Main.show()
+    app.exec_()

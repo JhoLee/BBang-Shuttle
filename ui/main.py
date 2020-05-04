@@ -10,21 +10,34 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 
+
 class Ui_Main(object):
     def setupUi(self, Main):
         Main.setObjectName("Main")
-        Main.resize(504, 300)
-        font = QtGui.QFont()
-        font.setFamily("Malgun Gothic")
-        font.setPointSize(10)
-        Main.setFont(font)
-        self.plainTextEdit = QtWidgets.QPlainTextEdit(Main)
-        self.plainTextEdit.setGeometry(QtCore.QRect(10, 90, 481, 161))
-        self.plainTextEdit.setObjectName("plainTextEdit")
+        Main.resize(531, 332)
+        self.centralwidget = QtWidgets.QWidget(Main)
+        self.centralwidget.setObjectName("centralwidget")
+        Main.setCentralWidget(self.centralwidget)
+        self.statusbar = QtWidgets.QStatusBar(Main)
+        self.statusbar.setObjectName("statusbar")
+        Main.setStatusBar(self.statusbar)
 
         self.retranslateUi(Main)
         QtCore.QMetaObject.connectSlotsByName(Main)
 
     def retranslateUi(self, Main):
         _translate = QtCore.QCoreApplication.translate
-        Main.setWindowTitle(_translate("Main", "Dialog"))
+        Main.setWindowTitle(_translate("Main", "MainWindow"))
+
+        # Open login dialog first
+        from ui.login import Ui_Login
+        Dialog = QtWidgets.QDialog()
+        dlg_login = Ui_Login()
+
+        dlg_login.setupUi()
+        # Dialog.setAttribute(QtCore.Qt.WA_DeleteOnClose)
+        dlg_login.exec()
+        id = dlg_login.edit_id.text()
+        pw = dlg_login.edit_pw.text()
+
+        pass

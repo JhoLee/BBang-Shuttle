@@ -9,13 +9,19 @@
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QMessageBox
+from PyQt5.QtWidgets import QDialog
 
 
-class Ui_Login(object):
-    def setupUi(self, Login):
-        Login.setObjectName("Login")
-        Login.resize(274, 300)
-        self.label = QtWidgets.QLabel(Login)
+class Ui_Login(QDialog):
+    def __init__(self):
+        super().__init__()
+        self.pw = None
+        self.id = None
+
+    def setupUi(self):
+        self.setObjectName("self")
+        self.resize(274, 300)
+        self.label = QtWidgets.QLabel(self)
         self.label.setGeometry(QtCore.QRect(20, 20, 91, 16))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
@@ -23,7 +29,7 @@ class Ui_Login(object):
         self.label.setFont(font)
         self.label.setAlignment(QtCore.Qt.AlignCenter)
         self.label.setObjectName("label")
-        self.label_2 = QtWidgets.QLabel(Login)
+        self.label_2 = QtWidgets.QLabel(self)
         self.label_2.setGeometry(QtCore.QRect(20, 60, 91, 16))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
@@ -31,14 +37,14 @@ class Ui_Login(object):
         self.label_2.setFont(font)
         self.label_2.setAlignment(QtCore.Qt.AlignCenter)
         self.label_2.setObjectName("label_2")
-        self.btn_login = QtWidgets.QPushButton(Login)
+        self.btn_login = QtWidgets.QPushButton(self)
         self.btn_login.setGeometry(QtCore.QRect(170, 250, 91, 31))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
         font.setPointSize(12)
         self.btn_login.setFont(font)
-        self.btn_login.setObjectName("btn_login")
-        self.chk_license = QtWidgets.QCheckBox(Login)
+        # self.btn_login.setObjectName("btn_login")
+        self.chk_license = QtWidgets.QCheckBox(self)
         self.chk_license.setGeometry(QtCore.QRect(20, 250, 141, 31))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
@@ -47,14 +53,14 @@ class Ui_Login(object):
         self.chk_license.setChecked(False)
         self.chk_license.setAutoRepeat(False)
         self.chk_license.setObjectName("chk_license")
-        self.edit_id = QtWidgets.QLineEdit(Login)
+        self.edit_id = QtWidgets.QLineEdit(self)
         self.edit_id.setGeometry(QtCore.QRect(120, 20, 131, 21))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
         font.setPointSize(10)
         self.edit_id.setFont(font)
         self.edit_id.setObjectName("edit_id")
-        self.edit_pw = QtWidgets.QLineEdit(Login)
+        self.edit_pw = QtWidgets.QLineEdit(self)
         self.edit_pw.setGeometry(QtCore.QRect(120, 60, 131, 21))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
@@ -62,7 +68,7 @@ class Ui_Login(object):
         self.edit_pw.setFont(font)
         self.edit_pw.setEchoMode(QtWidgets.QLineEdit.Password)
         self.edit_pw.setObjectName("edit_pw")
-        self.label_3 = QtWidgets.QLabel(Login)
+        self.label_3 = QtWidgets.QLabel(self)
         self.label_3.setGeometry(QtCore.QRect(10, 90, 251, 121))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
@@ -73,8 +79,8 @@ class Ui_Login(object):
         self.label_3.setWordWrap(True)
         self.label_3.setObjectName("label_3")
 
-        self.retranslateUi(Login)
-        QtCore.QMetaObject.connectSlotsByName(Login)
+        self.retranslateUi(self)
+        QtCore.QMetaObject.connectSlotsByName(self)
 
     def retranslateUi(self, Login):
         _translate = QtCore.QCoreApplication.translate
@@ -87,7 +93,7 @@ class Ui_Login(object):
 
     def check_validation(self):
         if self.chk_license.isChecked():
-            pass
+            self.close()
         else:
             self.show_messagebox('계속 진행하려면 라이선스에 동의해야합니다.', '경고', QMessageBox.Warning)
 
