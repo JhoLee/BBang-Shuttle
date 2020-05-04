@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 import sys
+from PyQt5.Qt import QSize, QIcon
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from utils import *
@@ -32,6 +33,8 @@ class Ui_Main(object):
     def setupUi(self, _wnd_main):
         _wnd_main.setObjectName("Main")
         _wnd_main.resize(531, 332)
+        _wnd_main.setFixedSize(QSize(531, 332))
+        _wnd_main.setWindowIcon(QIcon('../resources/main.ico'))
         self.centralwidget = QtWidgets.QWidget(_wnd_main)
         self.centralwidget.setObjectName("centralwidget")
         _wnd_main.setCentralWidget(self.centralwidget)
@@ -68,6 +71,9 @@ class Ui_Main(object):
                 break
         if selected_lecture_index is None:
             exit(-1)
+
+        if not dlg_lectures.is_clicked_start:
+            exit(-2)
 
         lecture = lectures[selected_lecture_index]
         courses = get_current_courses(driver, h_web_page, lecture)

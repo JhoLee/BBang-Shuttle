@@ -8,7 +8,7 @@
 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-from PyQt5.Qt import QMessageBox
+from PyQt5.Qt import QMessageBox, QSize, QIcon
 from PyQt5.QtWidgets import QDialog, QListWidgetItem
 from main import show_messagebox
 from PyQt5.QtGui import QStandardItemModel, QStandardItem
@@ -19,19 +19,22 @@ class Ui_Lectures(QDialog):
         super().__init__()
         self.lectures = lectures
         self.items = QStandardItemModel()
+        self.setFixedSize(QSize(272, 200))
+        self.setWindowIcon(QIcon('../resources/lectures.ico'))
+        self.is_clicked_start = False
 
     def setupUi(self):
         self.setObjectName("Lectures")
-        self.resize(272, 147)
+        self.resize(272, 200)
         self.lst_lectures = QtWidgets.QListWidget(self)
-        self.lst_lectures.setGeometry(QtCore.QRect(10, 30, 256, 71))
+        self.lst_lectures.setGeometry(QtCore.QRect(10, 30, 251, 121))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
         font.setPointSize(10)
         self.lst_lectures.setFont(font)
         self.lst_lectures.setObjectName("lst_lectures")
         self.btn_start = QtWidgets.QPushButton(self)
-        self.btn_start.setGeometry(QtCore.QRect(184, 110, 81, 31))
+        self.btn_start.setGeometry(QtCore.QRect(180, 160, 81, 31))
         font = QtGui.QFont()
         font.setFamily("Malgun Gothic")
         font.setPointSize(10)
@@ -51,6 +54,7 @@ class Ui_Lectures(QDialog):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("Lectures", "Dialog"))
         self.btn_start.setText(_translate("Lectures", "수강 시작"))
+        self.setWindowTitle(_translate("Login", "수강과목 선택 :: 한국교통대학교 e-Campus 출석체크"))
 
         # self.items = QStandardItemModel()
         # for lecture in self.lectures:
@@ -61,3 +65,9 @@ class Ui_Lectures(QDialog):
             self.lst_lectures.addItem(lec.text)
 
         QtCore.QMetaObject.connectSlotsByName(self)
+
+        self.btn_start.clicked.connect(self.start)
+
+    def start(self):
+        self.is_clicked_start = True
+        self.close()
