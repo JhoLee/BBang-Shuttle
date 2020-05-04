@@ -7,6 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 import sys
+from PyQt5.Qt import QSize, QIcon
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.QtWidgets import QMessageBox
 from utils import *
@@ -32,6 +33,8 @@ class Ui_Main(object):
     def setupUi(self, _wnd_main):
         _wnd_main.setObjectName("Main")
         _wnd_main.resize(531, 332)
+        _wnd_main.setFixedSize(QSize(531, 332))
+        _wnd_main.setWindowIcon(QIcon('../resources/main.ico'))
         self.centralwidget = QtWidgets.QWidget(_wnd_main)
         self.centralwidget.setObjectName("centralwidget")
         _wnd_main.setCentralWidget(self.centralwidget)
@@ -49,27 +52,33 @@ class Ui_Main(object):
         dlg_login.setupUi()
         dlg_login.exec()
 
-        # Get account information
-        self.id = dlg_login.edit_id.text()
-        self.pw = dlg_login.edit_pw.text()
+        driver = dlg_login.driver
+        h_web_page = dlg_login.h_web_page
+        # Get lecture information
+        lectures = dlg_login.lectures
+        if lectures is None:
+            exit()
 
-        self.login(self.id, self.pw)
+        from sources.lectures import Ui_Lectures
+        dlg_lectures = Ui_Lectures(lectures)
+        dlg_lectures.setupUi()
+        dlg_lectures.exec()
 
-    @staticmethod
-    def login(id, pw):
-        driver = load_webdriver(debug=True)
-        driver.implicitly_wait(3)
-        h_web_page = open_page(driver, 'https://ecampus.ut.ac.kr')
-        login(driver, h_web_page, '20029701', 'Qkrwotjr4$')
-        lectures = get_lectures(driver, h_web_page, year=2020)
-        lecture_range = range(len(lectures))
+        selected_lecture_index = None
+        for index in range(dlg_lectures.lst_lectures.count()):
+            if dlg_lectures.lst_lectures.item(index).isSelected():
+                selected_lecture_index = index
+                break
+        if selected_lecture_index is None:
+            exit(-1)
 
-        choice = int(input("Select the number you want >> "))
-        while choice not in lecture_range:
-            print("[WARN] Please Enter a number from {}~{}".format(0, len(lectures) - 1))
-            print()
-            choice = int(input("Select the number you want >> "))
-        lec = lectures[choice]
+        if not dlg_lectures.is_clicked_start:
+            exit(-2)
+
+        lecture = lectures[selected_lecture_index]
+        courses = get_current_courses(driver, h_web_page, lecture)
+        attend_courses(driver, h_web_page, courses)
+        driver.close()
 
 
 if __name__ == '__main__':
@@ -77,4 +86,4 @@ if __name__ == '__main__':
     wnd_main = QtWidgets.QMainWindow()
     Ui_Main().setupUi(wnd_main)
     wnd_main.show()
-    app.exec_()
+    sys.exit(app.exec_())

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>274</width>
+    <width>273</width>
     <height>300</height>
    </rect>
   </property>
@@ -60,16 +60,16 @@
   <widget class="QPushButton" name="btn_login">
    <property name="geometry">
     <rect>
-     <x>170</x>
-     <y>250</y>
-     <width>91</width>
+     <x>180</x>
+     <y>220</y>
+     <width>81</width>
      <height>31</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Malgun Gothic</family>
-     <pointsize>12</pointsize>
+     <pointsize>10</pointsize>
     </font>
    </property>
    <property name="text">
@@ -80,7 +80,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>250</y>
+     <y>220</y>
      <width>141</width>
      <height>31</height>
     </rect>
@@ -153,6 +153,31 @@
    </property>
    <property name="text">
     <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;justify&quot;&gt;본 프로그램의 사용으로 야기되는 어떠한 긍정적, 부정적 결과에 대해서도 제작자는 그 책임을 지지 않습니다.&lt;/p&gt;&lt;p align=&quot;justify&quot;&gt;본 프로그램은 사용자 입력 정보에 대한 어떠한 정보도 수집하거나 전송하지 않습니다.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
+   </property>
+   <property name="wordWrap">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_4">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>255</y>
+     <width>251</width>
+     <height>41</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <family>Malgun Gothic</family>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Version: 0.1 Powered by Chromedriver&lt;br/&gt;ⓒ 2020 @JhoLee, @cr3ux53c. All rights reserved.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
    </property>
    <property name="alignment">
     <set>Qt::AlignCenter</set>
