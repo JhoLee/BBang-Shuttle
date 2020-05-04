@@ -1,6 +1,7 @@
 import os
 import json
 import re
+import subprocess
 import time
 
 from requests import get
@@ -23,7 +24,7 @@ VER_LIST = ['80', '81', '83']
 def download_driver_path(current_os, version):
     if not os.path.exists('src'):
         os.makedirs('src')
-    extension = '.exe' if current_os == 'win' else '.exec'
+    extension = '.exe' if current_os == 'win' else ''
     path = os.path.join('src', 'chromedriver_{}_{}{}'.format(current_os, version, extension))
     if not os.path.exists(path):
         print("[INFO] Downloading driver from dropbox...", current_os, version)
@@ -32,6 +33,7 @@ def download_driver_path(current_os, version):
         with open(path, 'wb') as f:
             response = get(url)
             f.write(response.content)
+        subprocess.call(['chmod', '0755', path])
 
     return path
 
@@ -63,6 +65,7 @@ def _load_driver(driver, _path, options, debug=False):
             print("[DEBUG] Not match. Re-loading with another version.", _path)
             driver = None
 
+        print(driver)
     return driver
 
 
