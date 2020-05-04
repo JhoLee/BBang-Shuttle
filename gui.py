@@ -1,8 +1,9 @@
 import sys
 from PyQt5 import QtCore, QtGui, QtWidgets
+from PyQt5.QtWidgets import QMessageBox
 
 
-class Ui_Dialog(object):
+class DialogLogin(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.resize(274, 300)
@@ -74,12 +75,30 @@ class Ui_Dialog(object):
         self.label_2.setText(_translate("Dialog", "비밀번호 : "))
         self.btn_login.setText(_translate("Dialog", "로그인"))
         self.chk_license.setText(_translate("Dialog", "라이선스 동의함"))
+        self.btn_login.clicked.connect(self.check_validation)
 
+    def check_validation(self):
+        if self.chk_license.isChecked():
+            pass
+        else:
+            self.show_messagebox('계속 진행하려면 라이선스에 동의해야합니다.', '경고', QMessageBox.Warning)
+
+    @staticmethod
+    def show_messagebox(message, title, icon=QMessageBox.Information):
+        msg_box = QMessageBox()
+        msg_box.setIcon(icon)
+        msg_box.setText(message)
+        # msg_box.setInformativeText(message)
+        msg_box.setWindowTitle(title)
+        # msg_box.setDetailedText("The details are as follows:")
+        msg_box.setStandardButtons(QMessageBox.Ok)
+        retval = msg_box.exec_()
+        # print("value of pressed message box button:", retval)
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
     Dialog = QtWidgets.QDialog()
-    ui = Ui_Dialog()
+    ui = DialogLogin()
     ui.setupUi(Dialog)
     Dialog.show()
     sys.exit(app.exec_())
