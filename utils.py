@@ -1,5 +1,6 @@
 import os
 import json
+import re
 import time
 
 from selenium import webdriver
@@ -172,13 +173,29 @@ def get_current_courses(driver, main_window, lec):
     return courses
 
 
+def extract_progress(status):
+    progress = re.findall('\d+', status)
+    if len(progress) > 0:
+        return progress
+    else:
+        return 0
+
+
+def compute_left_time(lecture_time, progress):
+    """
+
+    :param lecture_time:
+    :param progress:
+    :return:
+    """
+    time_left = lecture_time * (100 - progress) * 36
+
+    return time_left
+
+
 def print_courses_info(courses):
     for idx, course in enumerate(courses):
-        if course['status'] != 'not progressed':
-            time_left = course['time'] * (100 - int(course['status'][12:14])) // 100
-        else:
-            time_left = course['time']
-        course['time_left'] = time_left
+        course['time_left'] = compute_left_time(course['time'], course['status'])
 
         print("({})".format(idx))
         print("#" * 40)
@@ -186,7 +203,9 @@ def print_courses_info(courses):
         print("\ttime:", course['time'], 'Minutes')
         print("\tperiod:", course['period'].replace('\n', ' '))
         print("\tstatus:", course['status'])
-        print("\ttime left: about", course['time_left'], 'Minutes')
+        print("\ttime left: {} Minutes and {} Seconds".format(
+            course['time_left'] // 60,
+            course['time_left'] % 60))
         print("#" * 40)
         print()
 
