@@ -35,6 +35,7 @@ class Ui_Main(object):
         self.selected_lecture_index = None
         self.dlg_login = None
         self.lecture_selected = None
+        self.driver = None
 
     def setupUi(self, mainwindow):
 
@@ -91,7 +92,7 @@ class Ui_Main(object):
         dlg_login.setupUi()
         dlg_login.exec()
 
-        driver = dlg_login.driver
+        self.driver = dlg_login.driver
         h_web_page = dlg_login.h_web_page
         # Get lecture information
         self.dlg_login = dlg_login
@@ -145,7 +146,7 @@ class Ui_Main(object):
         QTimer.singleShot(3000, loop.quit)
         loop.exec_()
         attend_courses(self.dlg_login.driver, self.dlg_login.h_web_page, courses)
-        driver.close()
+        self.driver.close()
 
 
     def start_real(self):
