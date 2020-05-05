@@ -47,7 +47,7 @@ class Ui_Main(QMainWindow):
         self.setObjectName("Main")
         self.resize(531, 312)
         self.setFixedSize(QSize(531, 312))
-        self.setWindowIcon(QIcon('../resources/main.ico'))
+        self.setWindowIcon(QIcon('../resources/breadzip.ico'))
         self.centralwidget = QtWidgets.QWidget()
         self.centralwidget.setObjectName("centralwidget")
 
