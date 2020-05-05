@@ -21,7 +21,7 @@ class Ui_Login(QDialog):
         self.lectures = None
         self.driver = None
         self.h_web_page = None
-        self.setWindowIcon(QIcon('../resources/login.ico'))
+        self.setWindowIcon(QIcon('../resources/breadzip.ico'))
         self.manager = manager
 
     def setupUi(self):

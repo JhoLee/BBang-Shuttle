@@ -21,7 +21,7 @@ class Ui_Lectures(QDialog):
         self.lectures = self.manager.lectures
         self.items = QStandardItemModel()
         self.setFixedSize(QSize(272, 200))
-        self.setWindowIcon(QIcon('../resources/lectures.ico'))
+        self.setWindowIcon(QIcon('../resources/breadzip.ico'))
         self.is_clicked_selection = False
 
     def setupUi(self):

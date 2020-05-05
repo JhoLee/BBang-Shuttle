@@ -53,15 +53,13 @@ def download_bbangshuttle(_os: str, _ver: str, dir=''):
     :type dir: str
     :return:
     """
-
-    url = 'https://bit.ly/BBangShuttle_{}_{}'.format(_os, _ver)
+    v = _ver.replace('.', '_')
+    url = 'http://bit.ly/BBangShuttle-{}-{}'.format(_os, v)
 
     name = '빵셔틀({}).{}'.format(_os, _ver)
-    if _os == 'win':
-        url += '.exe'
+    if _os == 'win' or _os == 'test':
         name += '.exe'
     elif _os == 'mac':
-        url += '.app'
         name += '.app'
 
     path = os.path.join(dir, name)
@@ -70,7 +68,7 @@ def download_bbangshuttle(_os: str, _ver: str, dir=''):
         update = get(url)
         f.write(update.content)
 
-    if _os != 'win':
+    if _os != 'win' and _os != 'test':
         subprocess.call(['chmod', '0755', path])
 
 
