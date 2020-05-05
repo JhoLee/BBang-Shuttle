@@ -192,6 +192,9 @@ class Ui_Main(QMainWindow):
         for log in self.manager.logs:
             self.lst_logs.addItem(log)
 
+    def closeEvent(self, *args, **kwargs):
+        self.manager.driver.close()
+
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
