@@ -127,9 +127,23 @@ class EcampusManager(object):
         input_pw.send_keys(self.pw)
 
         self.driver.execute_script('login_proc()')
-        time.sleep(11)
+        time.sleep(7)
+        self.login_check()
 
         self.log("{}, {}".format(self.msg['HELLO'], self.id))
+
+    def login_check(self):
+        self.log("Checking login...", 'debug')
+        try:
+            alert = self.driver.switch_to_alert()
+            self.log("Login Failed.", 'debug')
+            self.log(alert.text, 'debug')
+            is_success = False
+        except:
+            self.log("Login Success!", 'debug')
+            is_success = True
+
+        return is_success
 
     def logout(self):
         self.driver.switch_to.window(self.main_window)
