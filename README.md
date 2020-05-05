@@ -11,12 +11,13 @@
 ## 개발 중인 기능
  [ ] 강의 영상 mp4 다운로드 - 5월 13일까지.
  [ ] 선택한 강의만 출석체크하기 - 5월 13일까지.
+ [ ] 안정적인 인터페이스를 위한 멀티스레드 지원
  
  
 ---
 ## 다운로드
+ - Windows  : 
  - OS X(MAC): 
- - 윈도우즈: 
  
  
 ## 사용방법
@@ -31,14 +32,12 @@
  혼자 쓰긴 좀 아까워서 공유함.
  
 
-
-
-## Author
+## Authors
 
 **HyunSeok Lim**
 
  * [github/cr3ux53c](https://github.com/cr3ux53c)
- * [opentutorials/cr3ux53c](https://opentutorials.org/profile/59915)
+ * [opentutorials/cr3ux53c](https://opentutorials.org/course/3361)
  
 **JooHo Lee**
 
