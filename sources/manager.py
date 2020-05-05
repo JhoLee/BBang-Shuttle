@@ -128,7 +128,6 @@ class EcampusManager(object):
 
         self.driver.execute_script('login_proc()')
         time.sleep(7)
-        self.login_check()
 
         self.log("{}, {}".format(self.msg['HELLO'], self.id))
 
