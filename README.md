@@ -1,4 +1,4 @@
-# 빵셔틀 _(for KNUT)_
+# ![breadzip](https://user-images.githubusercontent.com/28856527/81030380-95ba4180-8ec3-11ea-91db-726a01dc868a.png)빵셔틀 _(for KNUT)_
 [교통대 이캠퍼스](https://ecampus.ut.ac.kr) 자동 출석체크 및 강의 영상 다운로더
  
 
@@ -9,9 +9,9 @@
  - **알아서** 강의 시간 측정해서 자동으로 **출첵!**
  
 ## 개발 중인 기능
- [ ] 강의 영상 mp4 다운로드 - 5월 13일까지.
- [ ] 선택한 강의만 출석체크하기 - 5월 13일까지.
- [ ] 안정적인 인터페이스를 위한 멀티스레드 지원
+- [ ] 강의 영상 mp4 다운로드 - 5월 13일까지.
+- [ ] 선택한 강의만 출석체크하기 - 5월 13일까지.
+- [ ] 안정적인 인터페이스를 위한 멀티스레드 지원
  
  
 ---
@@ -56,7 +56,3 @@
 
 Copyright © 2020, [@cr3ux53c](https://github.com/cr3ux53c), [@JhoLee](https://github.com/jholee).
 Released under the [MIT LIcense](LICENSE).
-
-***
-
-
