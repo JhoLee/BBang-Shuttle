@@ -25,20 +25,20 @@ class EcampusManager(object):
 
         # system
         self.os = check_os()
-        self.version = check_chrome_version()
+        self.version = check_chrome_version(self.os)
 
         # selenium
         self.driver = load_webdriver(show_chrome)
         self.main_window = None
 
         # list
-        self.lectures = []
-        self.courses = []
+        self.lecture = None
+        self.course = None
 
         # current status
-        self.lecture = None
-        self.courses = None  # 전체 코스 목록
-        self.attendable_courses = None # 출석해야 하는 코스 목
+        self.lectures = []
+        self.courses = []  # 전체 코스 목록
+        self.attendable_courses = [] # 출석해야 하는 코스 목
 
         # log
         self.logs = []
@@ -84,8 +84,8 @@ class EcampusManager(object):
             _level = level
         else:
             _level = 0
+        message = "({:%H:%M:%S}) [{}] {}".format(datetime.datetime.now(), level, message)
         if _level <= self.log_level:
-            message = "({:%H:%M:%S}) [{}] {}".format(datetime.datetime.now(), level, message)
             self.logs.append(message)
         print(message)
 
@@ -231,9 +231,9 @@ class EcampusManager(object):
         self.log("Finished to crawl courses.", 'DEBUG')
 
         if len(self.courses) == 0:
-            self.log("You don't have any courses to attend in this lecture!")
+            self.log("더 이상 출석할 강의가 없습니다!", 'info')
         else:
-            self.log("There are {} unattended courses.".format(len(self.courses)))
+            self.log("출석해야할 강의 수: {}".format(len(self.courses)))
             # self.print_courses_info()
             # TODO: Replace with printing in GUI.
             # Example
