@@ -86,6 +86,7 @@ def download_driver(current_os, version):
         with open(path, 'wb') as f:
             response = get(url)
             f.write(response.content)
+    if current_os != 'win':
         subprocess.call(['chmod', '0755', path])
     else:
         print("[INFO] Driver exists. ")
