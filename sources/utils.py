@@ -5,6 +5,7 @@ import subprocess
 import sys
 import time
 
+import appdirs
 from requests import get
 
 from selenium import webdriver
@@ -21,6 +22,9 @@ LOG_PATH = ''
 
 OS_LIST = {'Darwin': 'mac', 'Windows': 'win', 'Linux': 'lin'}
 VER_LIST = ['80', '81', '83']
+
+APP_NAME = 'BBangShuttle'
+APP_AUTHOR = 'TUNK'
 
 
 def check_latest():
@@ -77,10 +81,9 @@ def check_os():
     return current_os
 
 
-def check_chrome_version():
-    print("[INFO] Checking your chorme's version...")
-    current_os = check_os()
-    if current_os == 'win':
+def check_chrome_version(_os):
+    print("[DEBUG] Checking your chorme's version...")
+    if _os == 'win':
         import winreg as reg
 
         key = reg.HKEY_CURRENT_USER
@@ -98,12 +101,12 @@ def check_chrome_version():
             version = '80'
             print("[WARN] Chrome was not found...")
 
-    elif current_os == 'mac':
+    elif _os == 'mac':
         try:
             chrome_path = '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome'
-            version_info = subprocess.Popen([chrome_path, '--version'], stdout=subprocess.PIPE).stdout.read()
+            version_DEBUG = subprocess.Popen([chrome_path, '--version'], stdout=subprocess.PIPE).stdout.read()
 
-            version = re.findall('\d+', str(version_info))
+            version = re.findall('\d+', str(version_DEBUG))
             version = version[0]
         except:
             version = '80'
@@ -113,21 +116,22 @@ def check_chrome_version():
         version = '81'
         print("[WARN] Linux could not be supported... ")
 
-    print("[INFO] Chrome version:", version)
+    print("[DEBUG] Chrome version:", version)
 
     return version
 
 
 def download_driver(current_os, version):
-    # TODO: Modify path to temp path.
-    if not os.path.exists('res'):
-        os.makedirs('res')
+    dir = appdirs.user_data_dir(APP_NAME, APP_AUTHOR)
+
+    if not os.path.exists(dir):
+        os.makedirs(dir)
     extension = '.exe' if current_os == 'win' else ''
-    path = os.path.join('src', 'chromedriver_{}_{}{}'.format(current_os, version, extension))
+    path = os.path.join(dir, 'chromedriver_{}_{}{}'.format(current_os, version, extension))
     if not os.path.exists(path):
         if not os.path.exists(os.path.dirname(path)):
             os.makedirs(os.path.dirname(path))
-        print("[INFO] Downloading driver from dropbox...", current_os, version)
+        print("[DEBUG] Downloading driver from dropbox...", current_os, version)
         url = 'http://bit.ly/cd_{}_{}'.format(
             current_os, version)
         with open(path, 'wb') as f:
@@ -136,7 +140,7 @@ def download_driver(current_os, version):
     if current_os != 'win':
         subprocess.call(['chmod', '0755', path])
     else:
-        print("[INFO] Driver exists. ")
+        print("[DEBUG] Driver exists. ")
 
     return path
 
@@ -144,7 +148,7 @@ def download_driver(current_os, version):
 def load_webdriver(debug=False):
     current_os = check_os()
 
-    chrome_version = check_chrome_version()
+    chrome_version = check_chrome_version(current_os)
 
     options = webdriver.ChromeOptions()
 
@@ -199,7 +203,7 @@ def login(driver, main_window, _id, _pw):
     except:
         pass
 
-    print("[INFO] Login... id:", _id)
+    print("[DEBUG] Login... id:", _id)
     input_id = driver.find_element_by_id('id')
     input_pw = driver.find_element_by_id('pass')
 
@@ -210,7 +214,7 @@ def login(driver, main_window, _id, _pw):
     driver.execute_script('login_proc()')
     driver.implicitly_wait(13)
 
-    print("[INFO] Hello,", _id)
+    print("[DEBUG] Hello,", _id)
 
 
 def logout(driver, main_window):
@@ -223,23 +227,23 @@ def logout(driver, main_window):
 
 def change_display_language(driver, main_window, lang='english'):
     driver.switch_to.window(main_window)
-    print("[INFO] Changing display-lanuage into English for qualified searching...")
+    print("[DEBUG] Changing display-lanuage into English for qualified searching...")
     time.sleep(0.5)
     select_lang = driver.find_element_by_xpath("//select[@name='lang']/option[text()='ENGLISH']")
     select_lang.click()
     time.sleep(5)
-    print("[INFO] Display-lanuage has been changed to English.")
+    print("[DEBUG] Display-lanuage has been changed to English.")
 
 
 def get_lectures(driver, main_window, year):
-    print("[INFO] Crawling lectures info...")
+    print("[DEBUG] Crawling lectures info...")
     driver.switch_to.window(main_window)
     time.sleep(0.3)
     panel = driver.find_element_by_id('selfInfoAfter')
     lecture_list = panel.find_element_by_class_name('lecInfo')
 
     lectures = lecture_list.find_elements_by_xpath("//a[contains(., '{}')]".format(year))
-    print("[INFO] You have {} lectures...".format(len(lectures)))
+    print("[DEBUG] You have {} lectures...".format(len(lectures)))
     for idx, lecture in enumerate(lectures):
         print('\t[{}] {}'.format(idx, lecture.text))
     time.sleep(0.3)
@@ -247,7 +251,7 @@ def get_lectures(driver, main_window, year):
 
 
 def open_lecture_room(driver, window, lecture):
-    print("[INFO] Opening The Lecture Room for '{}'".format(lecture.text))
+    print("[DEBUG] Opening The Lecture Room for '{}'".format(lecture.text))
     driver.switch_to.window(window)
     time.sleep(0.3)
 
@@ -257,11 +261,11 @@ def open_lecture_room(driver, window, lecture):
     lecture_room_url = 'https://ecampus.ut.ac.kr/lms/class/courseSchedule/doListView.dunet'
     driver.get(lecture_room_url)
     time.sleep(1)
-    print("[INFO] Lecture room was opened.")
+    print("[DEBUG] Lecture room was opened.")
 
 
 def get_current_courses(driver, main_window, lec):
-    print("[INFO] Crawling courses...")
+    print("[DEBUG] Crawling courses...")
     driver.switch_to.window(main_window)
     time.sleep(0.3)
     open_lecture_room(driver, main_window, lec)
@@ -290,11 +294,11 @@ def get_current_courses(driver, main_window, lec):
                     'link': link,
                 }
             )
-    print("[INFO] Finished to crawl courses.")
+    print("[DEBUG] Finished to crawl courses.")
     if len(courses) == 0:
         print("[WARN] There are no unattended courses in this lecture!")
     else:
-        print("[INFO] There are {} unattended courses.".format(len(courses)))
+        print("[DEBUG] There are {} unattended courses.".format(len(courses)))
         print_courses_info(courses)
     return courses
 
@@ -338,18 +342,18 @@ def print_courses_info(courses):
 
 
 def attend_courses(driver, window, courses):
-    print("[INFO] Start to open courses.")
+    print("[DEBUG] Start to open courses.")
 
     driver.switch_to.window(window)
     time.sleep(0.3)
     for course in courses:
         attend_course(driver, window, course)
 
-    print("[INFO] Finished traveling courses.")
+    print("[DEBUG] Finished traveling courses.")
 
 
 def attend_course(driver, window, course):
-    print("[INFO] Opening the course '{}' for {} min {} sec.".format(
+    print("[DEBUG] Opening the course '{}' for {} min {} sec.".format(
         course['title'],
         course['time_left'] // 60,
         course['time_left'] % 60))
@@ -360,22 +364,22 @@ def attend_course(driver, window, course):
     course['link'].click()
     time.sleep(2)
     win_lec = driver.window_handles[-1]
-    print("[INFO] It was opened. ")
+    print("[DEBUG] It was opened. ")
     # Todo: Compute the ending time...
-    print("[INFO] It will be finished at ??:??.")
+    print("[DEBUG] It will be finished at ??:??.")
     time.sleep((course['time_left'] + 2))
     driver.switch_to.window(win_lec)
     time.sleep(2)
-    print("[INFO] Time Over!!")
+    print("[DEBUG] Time Over!!")
     if len(driver.window_handles) > 1:
         driver.close()
     driver.switch_to.window(window)
-    print("[INFO] Closed the course window.")
+    print("[DEBUG] Closed the course window.")
 
 
-def log(message, type='INFO'):
+def log(message, type='DEBUG'):
     # Todo
-    # example: "09:34:40 [INFO] Hello world"
+    # example: "09:34:40 [DEBUG] Hello world"
     pass
 
 
