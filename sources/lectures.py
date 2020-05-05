@@ -15,9 +15,10 @@ from PyQt5.QtGui import QStandardItemModel, QStandardItem
 
 
 class Ui_Lectures(QDialog):
-    def __init__(self, lectures):
+    def __init__(self, manager):
         super().__init__()
-        self.lectures = lectures
+        self.manager = manager
+        self.lectures = self.manager.lectures
         self.items = QStandardItemModel()
         self.setFixedSize(QSize(272, 200))
         self.setWindowIcon(QIcon('../resources/lectures.ico'))

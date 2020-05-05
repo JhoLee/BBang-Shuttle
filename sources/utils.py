@@ -23,6 +23,53 @@ OS_LIST = {'Darwin': 'mac', 'Windows': 'win', 'Linux': 'lin'}
 VER_LIST = ['80', '81', '83']
 
 
+def check_latest():
+    """
+    Check latest version info from 'https://bit.ly/BBangShuttle_ver'
+    :return: dict. e.g, {'ver': '0.1', 'date': '20.05.05', 'web': 'https://bit.ly/bbangshuttle_0.1'}
+    """
+
+    url = 'https://bit.ly/BBangShuttle_version'
+    ver_json = get(url).text
+    ver_info = json.loads(ver_json)
+
+    return ver_info[-1]
+
+
+def download_bbangshuttle(_os: str, _ver: str, dir=''):
+    """
+    Download 'bbangshuttle' into 'dir'.
+    From 'https://bit.ly/BBangShuttle_"$_os"_"$_ver".
+
+    :param _os: Current os's name. One of ['win', 'mac', 'lin']
+    :param _ver: Version number.
+    :param dir: Path of the directory to save
+    :type _os: str
+    :type _ver: str
+    :type dir: str
+    :return:
+    """
+
+    url = 'https://bit.ly/BBangShuttle_{}_{}'.format(_os, _ver)
+
+    name = '빵셔틀({}).{}'.format(_os, _ver)
+    if _os == 'win':
+        url += '.exe'
+        name += '.exe'
+    elif _os == 'mac':
+        url += '.app'
+        name += '.app'
+
+    path = os.path.join(dir, name)
+
+    with open(path, 'wb') as f:
+        update = get(url)
+        f.write(update.content)
+
+    if _os != 'win':
+        subprocess.call(['chmod', '0755', path])
+
+
 def check_os():
     current_os = OS_LIST[platform.system()]
 
