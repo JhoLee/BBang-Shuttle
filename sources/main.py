@@ -7,7 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 
 import sys
-from PyQt5.Qt import QSize, QIcon
+from PyQt5.Qt import QSize, QIcon, QTimer
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 from PyQt5.QtWidgets import QWidget
@@ -28,7 +28,7 @@ def show_messagebox(message, title, icon=QMessageBox.Information):
 
 class Ui_Main(object):
     def __init__(self):
-        #super().__init__()
+        # super().__init__()
         self.id = None
         self.pw = None
         self.manager = None
@@ -134,12 +134,27 @@ class Ui_Main(object):
     def start(self):
         self.btn_start.setEnabled(False)
         courses = get_current_courses(self.dlg_login.driver, self.dlg_login.h_web_page, self.lecture_selected)
+        for course in courses:
+            log_dump = "[INFO] Opening the course '{}' for {} min {} sec.".format(
+                course['title'],
+                course['time_left'] // 60,
+                course['time_left'] % 60)
+            self.lst_logs.addItem(log_dump)
+        from PyQt5.QtCore import QEventLoop
+        loop = QEventLoop()
+        QTimer.singleShot(3000, loop.quit)
+        loop.exec_()
         attend_courses(self.dlg_login.driver, self.dlg_login.h_web_page, courses)
         driver.close()
 
+
+    def start_real(self):
+        attend_courses(self.dlg_login.driver, self.dlg_login.h_web_page, courses)
+        driver.close()
+
+
     def close(self):
         self.close()
-
 
 if __name__ == '__main__':
     app = QtWidgets.QApplication(sys.argv)
