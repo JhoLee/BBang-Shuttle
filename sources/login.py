@@ -133,7 +133,7 @@ class Ui_Login(QDialog):
             self.show_messagebox('계속 진행하려면 라이선스에 동의해야합니다.', '경고', QMessageBox.Warning)
 
         if login_success:
-            self.show_messagebox('로그인 성공\n{}'.format('형~!@ 강의 목록좀 가져올께~~'), '정보', QMessageBox.Information)
+            self.show_messagebox('로그인 성공\n{}'.format('강의 목록좀 가져올께~~ 글구 실행되는 동안 웹사이트 접속하면 세션 끊기니까 조심해!!'), '정보', QMessageBox.Information)
             self.close()
 
 

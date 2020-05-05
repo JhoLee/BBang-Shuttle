@@ -13,7 +13,6 @@ ECAMPUS_PATH = {
 
 class EcampusManager(object):
 
-
     def __init__(self, debug=False, show_chrome=False):
         """
 
@@ -38,7 +37,8 @@ class EcampusManager(object):
         # current status
         self.lectures = []
         self.courses = []  # 전체 코스 목록
-        self.attendable_courses = [] # 출석해야 하는 코스 목
+        self.attendable_courses = []  # 출석해야 하는 코스 목록
+        self.attendable_courses_info = []
 
         # log
         self.logs = []
@@ -145,7 +145,7 @@ class EcampusManager(object):
             self.log("Login Success!", 'debug')
             is_success = True
 
-        return is_success,  msg
+        return is_success, msg
 
     def logout(self):
         self.driver.switch_to.window(self.main_window)
@@ -238,25 +238,44 @@ class EcampusManager(object):
         else:
             self.log("출석해야할 강의 수: {}".format(len(self.attendable_courses)))
             # self.print_courses_info()
-            # TODO: Replace with printing in GUI.
-            # Example
-            """
-            ###########################################
-                title: 'Computer Vision'
-                time: 50 Minutes
-                period: 2020.05.04 ~ 2020.05.08
-                status: not progressed
-                time left: 50 Minutes and 0 Seconds
-            ############################################
-            """
+            self.get_attendable_courses_info()
+            for info in self.attendable_courses_info:
+                self.log(info, 'INFO')
+
+    def get_attendable_courses_info(self):
+
+        self.attendable_courses_info = []
+        for course in self.attendable_courses:
+            course['progress'] = self.extract_progress(course['status'])
+            course['time_left'] = self.compute_left_time(lecture_time=course['time'], progress=course['progress'])
+            self.attendable_courses_info.append( \
+                """
+                ###########################################
+                    title: {title}
+                    time: {time} Minutes
+                    period: {period}
+                    status: {status}
+                    time left: {left_min} Minutes and {left_sec} Seconds
+                ############################################
+                """.format(
+                    title=course['title'],
+                    time=course['time'],
+                    period=course['period'].replace('\n', ''),
+                    status=course['status'],
+                    left_min=course['time_left'] // 60 + 2,
+                    left_sec=course['time_left'] % 60).replace('\t', ' '))
 
     def attend_course(self, course_idx):
         # self.course = self.courses[course_idx]
         self.course = self.attendable_courses.pop(course_idx)
-        self.log("Opening the course '{}' for {} min {} sec.".format(
-            self.course['title'],
-            self.course['time_left'] // 60 + 2,
-            self.course['time_left'] % 60))
+
+        self.course['progress'] = self.extract_progress(self.course['status'])
+        self.course['time_left'] = self.compute_left_time(lecture_time=self.course['time'], progress=self.course['progress'])
+
+        # self.log("Opening the course '{}' for {} min {} sec.".format(
+        #     self.course['title'],
+        #     self.course['time_left'] // 60 + 2,
+        #     self.course['time_left'] % 60))
         self.driver.switch_to.window(self.main_window)
         time.sleep(2)
 
@@ -291,7 +310,6 @@ class EcampusManager(object):
             self.attend_course(idx)
 
         self.log("현재 강의 내의 모든 영상 출석 완료!", 'info')
-
 
     @staticmethod
     def extract_progress(status: str):
@@ -337,13 +355,12 @@ class EcampusManager(object):
                 "Course ended.",
             ],
 
-
-
         }
 
         messages = {key: message[_lang] for key, message in messages.items()}
 
         return messages
+
 
 if __name__ == "__main__":
     print("Testing...")

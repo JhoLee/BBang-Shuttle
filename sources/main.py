@@ -179,6 +179,7 @@ class Ui_Main(QMainWindow):
 
     def start(self):
         self.btn_start.setEnabled(False)
+        self.lst_logs.addItem("[INFO] 수강 시작합니다~")
         courses = self.manager.courses
 
         # for course in courses:
