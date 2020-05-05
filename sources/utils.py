@@ -148,7 +148,7 @@ def load_webdriver(debug=False):
 
     chrome_version = check_chrome_version(current_os)
 
-    options = webdriver.ChromeOptions()
+    options = webdriver.chrome.options.Options()
 
     driver = None
 
@@ -167,6 +167,7 @@ def load_webdriver(debug=False):
 def _load_driver(driver, _path, options, debug=False):
     if driver is None:
         if not debug:
+            options.set_headless(headless=True)
             options.add_argument('headless')
             options.add_argument('window-size=1920x1080')
             options.add_argument('disable-gpu')
