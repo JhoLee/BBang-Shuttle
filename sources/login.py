@@ -114,6 +114,10 @@ class Ui_Login(QDialog):
 
     def check_validation(self):
         self.btn_login.setText("로그인 중...")
+        # time.sleep(0.1)
+
+        login_success = False
+
         if self.chk_license.isChecked():
             if self.edit_id.text() == '' or self.edit_pw.text() == '':
                 show_messagebox('로그인 정보를 입력하십시오.', '경고', QMessageBox.Warning)
@@ -121,13 +125,17 @@ class Ui_Login(QDialog):
                 self.manager.id = self.edit_id.text()
                 self.manager.pw = self.edit_pw.text()
                 self.manager.login()
+                login_success, error_msg = self.manager.login_check()
+                if not login_success:
+                    self.show_messagebox('로그인 실패\n{}'.format(error_msg), '경고', QMessageBox.Warning)
 
-                # import time
-                # self.manager.get_lectures(year=time.gmtime().tm_year)
-                # Modified to get lecture list in main.py - 20.05.05 13:30 by Jho.
-                self.close()
         else:
             self.show_messagebox('계속 진행하려면 라이선스에 동의해야합니다.', '경고', QMessageBox.Warning)
+
+        if login_success:
+            self.show_messagebox('로그인 성공\n{}'.format('형~!@ 강의 목록좀 가져올께~~'), '정보', QMessageBox.Information)
+            self.close()
+
 
     @staticmethod
     def show_messagebox(message, title, icon=QMessageBox.Information):

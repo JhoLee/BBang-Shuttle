@@ -133,16 +133,19 @@ class EcampusManager(object):
 
     def login_check(self):
         self.log("Checking login...", 'debug')
+        msg = ''
         try:
             alert = self.driver.switch_to_alert()
+            msg += alert.text
             self.log("Login Failed.", 'debug')
-            self.log(alert.text, 'debug')
+            self.log(msg, 'debug')
+            alert.accept()
             is_success = False
         except:
             self.log("Login Success!", 'debug')
             is_success = True
 
-        return is_success
+        return is_success,  msg
 
     def logout(self):
         self.driver.switch_to.window(self.main_window)

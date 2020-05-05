@@ -42,6 +42,12 @@ class Ui_Main(QMainWindow):
         self.lecture_selected = None
         self.setupUi()
 
+    def show(self):
+        super().show()
+        self.manager.get_attendable_courses(self.selected_lecture_index)
+        for log in self.manager.logs:
+            self.lst_logs.addItem(log)
+
     def setupUi(self):
 
         self.setObjectName("Main")
@@ -113,8 +119,6 @@ class Ui_Main(QMainWindow):
             elif result == QMessageBox.No:
                 pass
 
-
-
         # Open login dialog first
         from sources.login import Ui_Login
         dlg_login = Ui_Login(manager=self.manager)
@@ -151,9 +155,7 @@ class Ui_Main(QMainWindow):
 
             self.lecture_selected = lectures[self.selected_lecture_index]
 
-            self.manager.get_attendable_courses(self.selected_lecture_index)
-            for log in self.manager.logs:
-                self.lst_logs.addItem(log)
+            self.lst_logs.addItem('수강 중인 강의 정보 가져오는 중...')
 
             # Todo: Generate manager instance in main.py not in login.py
             # self.manager = dlg_login.manager
