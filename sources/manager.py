@@ -104,7 +104,7 @@ class EcampusManager(object):
             self.driver.switch_to.window(self.main_window)
             time.sleep(1)
         self.driver.get(ECAMPUS_PATH['MAIN'])
-        time.sleep(3)
+        time.sleep(1.5)
         self.main_window = self.driver.current_window_handle
 
         self.log("Opened main page.", 'DEBUG')
@@ -113,7 +113,7 @@ class EcampusManager(object):
         """
         Login with self.id, self.pw
         """
-        self.open_main()
+
         try:
             self.logout()
         except:

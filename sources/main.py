@@ -98,6 +98,7 @@ class Ui_Main(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(self)
 
         self.manager = EcampusManager()
+        self.manager.open_main()
 
         # Check new version
         new_version_info = utils.check_latest()
@@ -170,7 +171,9 @@ class Ui_Main(QMainWindow):
             # #     print_to_gui(self.manager.logs.pop(0))
             #
             # self.manager.driver.close()
-        except:
+        except Exception as e:
+        #     print(e)
+            self.manager.driver.close()
             exit(-4)
 
     def start(self):
@@ -192,7 +195,7 @@ class Ui_Main(QMainWindow):
         for log in self.manager.logs:
             self.lst_logs.addItem(log)
 
-    def closeEvent(self, *args, **kwargs):
+    def closeEvent(self, a0: QtGui.QCloseEvent):
         self.manager.driver.close()
 
 
