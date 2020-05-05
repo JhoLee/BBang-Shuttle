@@ -148,7 +148,7 @@ def download_driver(current_os, version):
 def load_webdriver(debug=False):
     current_os = check_os()
 
-    chrome_version = check_chrome_version()
+    chrome_version = check_chrome_version(current_os)
 
     options = webdriver.ChromeOptions()
 
