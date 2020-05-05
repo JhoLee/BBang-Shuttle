@@ -329,8 +329,8 @@ class EcampusManager(object):
                 "Hello",
             ],
             'COURSES_TO_ATTEND': [
-                "출석해야 하는 강의 수:",
-                "Courses to attend:"
+                "이번주에 출석해야 하는 강의 수:",
+                "Courses to attend due this week:"
             ],
             'COURSE_END': [
                 "강의가 끝났습니다.",
