@@ -78,6 +78,8 @@ def download_driver(current_os, version):
     extension = '.exe' if current_os == 'win' else ''
     path = os.path.join('src', 'chromedriver_{}_{}{}'.format(current_os, version, extension))
     if not os.path.exists(path):
+        if not os.path.exists(os.path.dirname(path)):
+            os.makedirs(os.path.dirname(path))
         print("[INFO] Downloading driver from dropbox...", current_os, version)
         url = 'http://bit.ly/cd_{}_{}'.format(
             current_os, version)
