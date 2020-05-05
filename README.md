@@ -19,6 +19,10 @@
  - Windows  : 
  - OS X(MAC): 
  
+
+## 빌드
+`pyinstaller --noconsole --icon=resources/breadzip.ico --onefile sources/main.py`
+
  
 ## 사용방법
 []

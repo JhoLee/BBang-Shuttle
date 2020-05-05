@@ -59,7 +59,7 @@ class Ui_Main(object):
         font.setFamily("Malgun Gothic")
         font.setPointSize(10)
         self.label_4.setFont(font)
-        self.label_4.setText("<html><head/><body><p align=\"center\"><span style=\" font-size:8pt;\">Version: 0.1 Powered by Chromedriver<br/>ⓒ 2020 @JhoLee, @cr3ux53c. All rights reserved.</span></p></body></html>")
+        self.label_4.setText("<html><head/><body><p align=\"center\"><span style=\" font-size:8pt;\">Version: 0.1 Powered by ChromeDriver<br/>ⓒ 2020 @JhoLee, @cr3ux53c. All rights reserved.</span></p></body></html>")
         self.label_4.setAlignment(QtCore.Qt.AlignCenter)
         self.label_4.setWordWrap(True)
         self.label_4.setObjectName("label_4")
