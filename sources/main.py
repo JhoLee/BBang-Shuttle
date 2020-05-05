@@ -5,6 +5,7 @@
 # Created by: PyQt5 UI code generator 5.13.0
 #
 # WARNING! All changes made in this file will be lost!
+import utils
 
 APP_VERSION = 0.1
 
@@ -91,6 +92,28 @@ class Ui_Main(QMainWindow):
         QtCore.QMetaObject.connectSlotsByName(self)
 
         self.manager = EcampusManager()
+
+        # Check new version
+        new_version_info = utils.check_latest()
+        if APP_VERSION < float(new_version_info['ver']):
+            msg_box = QMessageBox()
+            msg_box.setIcon(QMessageBox.Information)
+            msg_box.setText('새로운 버전 출시!\t\t')
+            msg_box.setInformativeText('버 전: v{}\n업데이트 날짜: {}\n\n새 버전을 다운로드 할까요?'.format(new_version_info['ver'], new_version_info['date']))
+            msg_box.setWindowTitle('업데이트 알림')
+            # msg_box.setDetailedText("The details are as follows:")
+            msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+            result = msg_box.exec_()
+
+            if result == QMessageBox.Yes:
+                show_messagebox('형 나 갔다올께~ 잠시만 ㄱㄷ~~\t', '다운로드 시작', QMessageBox.Information)
+                utils.download_bbangshuttle('test', new_version_info['ver'])
+                show_messagebox('새 버전 다운로드 완료!\n새로운 파일로 실행하세요.', '알림', QMessageBox.Information)
+                exit(0)
+            elif result == QMessageBox.No:
+                pass
+
+
 
         # Open login dialog first
         from sources.login import Ui_Login
