@@ -208,7 +208,7 @@ class EcampusManager(object):
         self.change_display_language('English')
 
         attendable_courses_link = self.driver.find_elements_by_xpath("//a[contains(., 'Lecture view')]")
-        attendable_courses = [course_link.find_element_by_xpath(".../..") for course_link in attendable_courses_link]
+        attendable_courses = [course_link.find_element_by_xpath("../..") for course_link in attendable_courses_link]
 
         # self.courses = []
         for course in attendable_courses:
