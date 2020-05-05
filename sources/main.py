@@ -91,6 +91,7 @@ class Ui_Main(QMainWindow):
         self.btn_start.setFont(font)
 
         _translate = QtCore.QCoreApplication.translate
+        self.setWindowTitle(_translate("Login", "e-Campus 자동 출석체크 :: KNUT 빵셔틀"))
         # _wnd_main.setWindowTitle(_translate("Main", "MainWindow"))
         # self.btn_close.setText("수강 중지 및 로그아웃")
         # self.btn_close.clicked.connect(self.close)
