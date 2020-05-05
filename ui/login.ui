@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Login</class>
- <widget class="QDialog" name="Login">
+ <class>Dialog</class>
+ <widget class="QDialog" name="Dialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>273</width>
+    <width>274</width>
     <height>300</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>한국교통대학교 e-Campus 출석체크</string>
+   <string>KNUT 빵셔틀</string>
   </property>
   <widget class="QLabel" name="label">
    <property name="geometry">
@@ -60,16 +60,16 @@
   <widget class="QPushButton" name="btn_login">
    <property name="geometry">
     <rect>
-     <x>180</x>
-     <y>220</y>
-     <width>81</width>
+     <x>170</x>
+     <y>250</y>
+     <width>91</width>
      <height>31</height>
     </rect>
    </property>
    <property name="font">
     <font>
      <family>Malgun Gothic</family>
-     <pointsize>10</pointsize>
+     <pointsize>12</pointsize>
     </font>
    </property>
    <property name="text">
@@ -80,7 +80,7 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>220</y>
+     <y>250</y>
      <width>141</width>
      <height>31</height>
     </rect>
@@ -161,32 +161,13 @@
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="label_4">
-   <property name="geometry">
-    <rect>
-     <x>10</x>
-     <y>255</y>
-     <width>251</width>
-     <height>41</height>
-    </rect>
-   </property>
-   <property name="font">
-    <font>
-     <family>Malgun Gothic</family>
-     <pointsize>10</pointsize>
-    </font>
-   </property>
-   <property name="text">
-    <string notr="true">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p align=&quot;center&quot;&gt;&lt;span style=&quot; font-size:8pt;&quot;&gt;Version: 0.1 Powered by Chromedriver&lt;br/&gt;ⓒ 2020 @JhoLee, @cr3ux53c. All rights reserved.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-   </property>
-   <property name="alignment">
-    <set>Qt::AlignCenter</set>
-   </property>
-   <property name="wordWrap">
-    <bool>true</bool>
-   </property>
-  </widget>
  </widget>
+ <tabstops>
+  <tabstop>edit_id</tabstop>
+  <tabstop>edit_pw</tabstop>
+  <tabstop>chk_license</tabstop>
+  <tabstop>btn_login</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
  <slots>

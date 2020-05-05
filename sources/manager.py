@@ -32,13 +32,13 @@ class EcampusManager(object):
         self.main_window = None
 
         # list
-        self.lectures = []
-        self.courses = []
+        self.lecture = None
+        self.course = None
 
         # current status
-        self.lecture = None
-        self.courses = None  # 전체 코스 목록
-        self.attendable_courses = None # 출석해야 하는 코스 목
+        self.lectures = []
+        self.courses = []  # 전체 코스 목록
+        self.attendable_courses = [] # 출석해야 하는 코스 목
 
         # log
         self.logs = []
@@ -207,7 +207,7 @@ class EcampusManager(object):
         attendable_courses_link = self.driver.find_elements_by_xpath("//a[contains(., 'Lecture view')]")
         attendable_courses = [course_link.find_element_by_xpath(".../..") for course_link in attendable_courses_link]
 
-        self.courses = []
+        # self.courses = []
         for course in attendable_courses:
             datas = course.find_elements_by_tag_name('td')
 
@@ -218,7 +218,7 @@ class EcampusManager(object):
             link = datas[5].find_element_by_class_name('lectureWindow')
 
             if status != 'Complete':
-                self.courses.append(
+                self.attendable_courses.append(
                     {
                         'title': title,
                         'time': int(lecture_time[:-6]),
@@ -230,10 +230,10 @@ class EcampusManager(object):
 
         self.log("Finished to crawl courses.", 'DEBUG')
 
-        if len(self.courses) == 0:
+        if len(self.attendable_courses) == 0:
             self.log("You don't have any courses to attend in this lecture!")
         else:
-            self.log("There are {} unattended courses.".format(len(self.courses)))
+            self.log("There are {} unattended courses.".format(len(self.attendable_courses)))
             # self.print_courses_info()
             # TODO: Replace with printing in GUI.
             # Example

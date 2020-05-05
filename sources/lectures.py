@@ -55,7 +55,7 @@ class Ui_Lectures(QDialog):
         _translate = QtCore.QCoreApplication.translate
         self.setWindowTitle(_translate("Lectures", "Dialog"))
         self.btn_select_subject.setText(_translate("Lectures", "과목 선택"))
-        self.setWindowTitle(_translate("Login", "수강과목 선택 :: 한국교통대학교 e-Campus 출석체크"))
+        self.setWindowTitle(_translate("Login", "수강과목 선택 :: KNUT 빵셔틀"))
 
         # self.items = QStandardItemModel()
         # for lecture in self.lectures:

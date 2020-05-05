@@ -7,8 +7,7 @@
 # WARNING! All changes made in this file will be lost!
 from manager import EcampusManager
 
-APP_VERSION = 0.1
-
+from main import APP_VERSION
 from PyQt5 import QtCore, QtGui, QtWidgets
 from PyQt5.Qt import QMessageBox, QSize, QIcon
 from PyQt5.QtWidgets import QDialog
@@ -99,10 +98,13 @@ class Ui_Login(QDialog):
 
         self.retranslateUi(self)
         QtCore.QMetaObject.connectSlotsByName(self)
+        self.setTabOrder(self.edit_id, self.edit_pw)
+        self.setTabOrder(self.edit_pw, self.chk_license)
+        self.setTabOrder(self.chk_license, self.btn_login)
 
     def retranslateUi(self, Login):
         _translate = QtCore.QCoreApplication.translate
-        Login.setWindowTitle(_translate("Login", "로그인 :: 한국교통대학교 e-Campus 출석체크"))
+        Login.setWindowTitle(_translate("Login", "로그인 :: KNUT 빵셔틀"))
         self.label.setText(_translate("Login", "학     번 : "))
         self.label_2.setText(_translate("Login", "비밀번호 : "))
         self.btn_login.setText(_translate("Login", "로그인"))
