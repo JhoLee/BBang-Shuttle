@@ -37,7 +37,8 @@ class EcampusManager(object):
 
         # current status
         self.lecture = None
-        self.courses = None
+        self.courses = None  # 전체 코스 목록
+        self.attendable_courses = None # 출석해야 하는 코스 목
 
         # log
         self.logs = []
@@ -234,8 +235,8 @@ class EcampusManager(object):
             """
 
     def attend_course(self, course_idx):
-        self.course = self.courses[course_idx]
-
+        # self.course = self.courses[course_idx]
+        self.course = self.attendable_courses.pop(course_idx)
         self.log("Opening the course '{}' for {} min {} sec.".format(
             self.course['title'],
             self.course['time_left'] // 60 + 2,
@@ -253,7 +254,9 @@ class EcampusManager(object):
 
         self.lecture_window = self.driver.window_handles[-1]
         self.log("Lecture opened. It will be finished at {}".format(finish_time), 'debug')
-        # TODO: Conver to thread.
+        # TODO: Convert to thread.
+        # TODO: Or while loop..?
+        # Todo: Or checking main's remain time
         time.sleep(self.course['time_left'])
 
         self.driver.switch_to.window(self.lecture_window)
@@ -263,6 +266,16 @@ class EcampusManager(object):
             self.driver.close()
         self.driver.switch_to.window(self.main_window)
         self.log("{} '{}'".format(self.msg['COURSE_END'], self.course.text), 'info')
+
+    def attend_all_courses(self):
+        self.log("Attending all courses in the lecture..", 'debug')
+        self.driver.switch_to.window(self.main_window)
+        self.driver.implicitly_wait(1)
+        for idx, course in enumerate(self.attendable_courses):
+            self.attend_course(idx)
+
+        self.log("현재 강의 내의 모든 영상 출석 완료!", 'info')
+
 
     @staticmethod
     def extract_progress(status: str):

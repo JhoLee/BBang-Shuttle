@@ -11,7 +11,8 @@ from PyQt5.Qt import QSize, QIcon, QTimer
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtWidgets import QMessageBox, QMainWindow
 from PyQt5.QtWidgets import QWidget
-from utils import *
+
+from sources.manager import EcampusManager
 
 
 def show_messagebox(message, title, icon=QMessageBox.Information):
@@ -85,22 +86,26 @@ class Ui_Main(object):
         mainwindow.setCentralWidget(self.centralwidget)
         QtCore.QMetaObject.connectSlotsByName(mainwindow)
 
+        self.manager = EcampusManager()
+
         # Open login dialog first
         from sources.login import Ui_Login
-        dlg_login = Ui_Login()
+        dlg_login = Ui_Login(manager=self.manager)
         dlg_login.setupUi()
         dlg_login.exec()
+        self.manager = dlg_login.manager
 
-        driver = dlg_login.driver
-        h_web_page = dlg_login.h_web_page
         # Get lecture information
-        self.dlg_login = dlg_login
-        lectures = dlg_login.lectures
+        import time
+        self.manager.get_lectures(year=time.gmtime().tm_year)
+        # driver = dlg_login.driver
+        # h_web_page = dlg_login.h_web_page
+        lectures = self.manager.lectures
         if lectures is None:
             exit(-3)
 
         from sources.lectures import Ui_Lectures
-        dlg_lectures = Ui_Lectures(lectures)
+        dlg_lectures = Ui_Lectures(manager=self.manager)
         dlg_lectures.setupUi()
         dlg_lectures.exec()
 
@@ -133,7 +138,9 @@ class Ui_Main(object):
 
     def start(self):
         self.btn_start.setEnabled(False)
-        courses = get_current_courses(self.dlg_login.driver, self.dlg_login.h_web_page, self.lecture_selected)
+        self.manager.get_attendable_courses(self.selected_lecture_index)
+        courses = self.manager.courses
+
         for course in courses:
             log_dump = "[INFO] Opening the course '{}' for {} min {} sec.".format(
                 course['title'],
@@ -144,13 +151,14 @@ class Ui_Main(object):
         loop = QEventLoop()
         QTimer.singleShot(3000, loop.quit)
         loop.exec_()
-        attend_courses(self.dlg_login.driver, self.dlg_login.h_web_page, courses)
-        driver.close()
+        self.manager.attend_all_courses()
+        self.manager.driver.close()
 
 
     def start_real(self):
-        attend_courses(self.dlg_login.driver, self.dlg_login.h_web_page, courses)
-        driver.close()
+        self.manager.attend_all_courses()
+        # attend_courses(self.dlg_login.driver, self.dlg_login.h_web_page, courses)
+        self.manager.driver.close()
 
 
     def close(self):

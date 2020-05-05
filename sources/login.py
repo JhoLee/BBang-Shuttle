@@ -17,12 +17,13 @@ from utils import *
 
 
 class Ui_Login(QDialog):
-    def __init__(self):
+    def __init__(self, manager=None):
         super().__init__()
         self.lectures = None
         self.driver = None
         self.h_web_page = None
         self.setWindowIcon(QIcon('../resources/login.ico'))
+        self.manager = manager
 
     def setupUi(self):
         self.setObjectName("self")
@@ -115,22 +116,16 @@ class Ui_Login(QDialog):
             if self.edit_id.text() == '' or self.edit_pw.text() == '':
                 show_messagebox('로그인 정보를 입력하십시오.', '경고', QMessageBox.Warning)
             else:
-                manager = self.login()
-                self.driver, self.h_web_page, self.lectures = manager.driver, manager.main_window, manager.lectures
+                self.manager.id = self.edit_id.text()
+                self.manager.pw = self.edit_pw.text()
+                self.manager.login()
+
+                # import time
+                # self.manager.get_lectures(year=time.gmtime().tm_year)
+                # Modified to get lecture list in main.py - 20.05.05 13:30 by Jho.
                 self.close()
         else:
             self.show_messagebox('계속 진행하려면 라이선스에 동의해야합니다.', '경고', QMessageBox.Warning)
-
-    def login(self):
-        manager = EcampusManager(debug=True, show_chrome=False)
-
-        manager.id = self.edit_id.text()
-        manager.pw = self.edit_pw.text()
-        manager.login()
-
-        manager.get_lectures(year=2020)
-
-        return manager
 
     @staticmethod
     def show_messagebox(message, title, icon=QMessageBox.Information):
