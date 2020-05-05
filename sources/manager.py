@@ -25,7 +25,7 @@ class EcampusManager(object):
 
         # system
         self.os = check_os()
-        self.version = check_chrome_version()
+        self.version = check_chrome_version(self.os)
 
         # selenium
         self.driver = load_webdriver(show_chrome)
