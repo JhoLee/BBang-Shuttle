@@ -67,6 +67,14 @@ class EcampusManager(object):
     def pw(self, value):
         self.__pw = value
 
+    @property
+    def courses(self):
+        return self.courses
+
+    @courses.setter
+    def courses(self, courses):
+        self.courses = courses
+
     def log(self, message, level='INFO'):
         """
         Push messages into a list(queue).
@@ -198,8 +206,44 @@ class EcampusManager(object):
 
         self.log("Lecture room for '{}' was opened.".format(lecture_name), 'DEBUG')
 
+    def crawl_courses(self, lecture_idx):
+        # TODO: Modify to use this method in main.
+        self.driver.switch_to.window(self.main_window)
+        time.sleep(2)
+
+        self.open_lecture(lecture_idx)
+        self.change_display_language('English')  # TODO: Modify to use Korean instead.
+
+        courses_link = self.driver.find_elements_by_xpath("//a[cotains(., 'Lecture view')]")
+        courses_element = [course_link.find_element_by_xpath("../..") for course_link in courses_link]
+
+        courses = []
+        for course in courses_element:
+            datas = course.find_elements_by_tag_name('td')
+
+            title = datas[1].txt
+            lecture_time = datas[2].txt
+            period = datas[3].text
+            status = datas[4].text
+            link = datas[5].find_element_by_class_name('lectureWindow')
+            progress = self.extract_progress(status)
+            time_left = self.compute_left_time(lecture_time=lecture_time, progress=progress)
+
+            courses.append(
+                {
+                    'title': title,
+                    'time': int(lecture_time[:-6]),
+                    'period': period,
+                    'status': status,
+                    'link': link,
+                    'progress': progress,
+                    'time_left': time_left,
+                }
+            )
+        return courses
+
     def get_attendable_courses(self, lecture_idx):
-        self.log("Crawling attendable courses...", 'DEBUG')
+        self.log("강의 목록을 가져옵니다.", 'DEBUG')
         self.driver.switch_to.window(self.main_window)
         time.sleep(2)
 
@@ -220,6 +264,9 @@ class EcampusManager(object):
             status = datas[4].text
             link = datas[5].find_element_by_class_name('lectureWindow')
 
+            progress = self.extract_progress(status)
+            time_left = self.compute_left_time(lecture_time=lecture_time, progress=progress)
+
             if status != 'Complete':
                 self.attendable_courses.append(
                     {
@@ -228,10 +275,23 @@ class EcampusManager(object):
                         'period': period,
                         'status': status,
                         'link': link,
+                        'progress': progress,
+                        'time_left': time_left,
                     }
                 )
+            self.courses.append(
+                {
+                    'title': title,
+                    'time': int(lecture_time[:-6]),
+                    'period': period,
+                    'status': status,
+                    'link': link,
+                    'progress': progress,
+                    'time_left': time_left,
+                }
+            )
 
-        self.log("Finished to crawl courses.", 'DEBUG')
+        self.log("강의 목록 조회 완료!", 'info')
 
         if len(self.attendable_courses) == 0:
             self.log("더 이상 출석할 강의가 없습니다!", 'info')
@@ -241,29 +301,51 @@ class EcampusManager(object):
             self.get_attendable_courses_info()
             for info in self.attendable_courses_info:
                 self.log(info, 'INFO')
+        self.log("전체 강의 수: {}".format(len(self.courses)))
+
+    def get_course_info(self, course):
+        # course = self.courses[course_idx]
+
+        course_info = \
+            """
+            ###########################################
+                title: {title}
+                time: {time} Minutes
+                period: {period}
+                status: {status}
+                time left: {left_min} Minutes and {left_sec} Seconds
+            ############################################
+            """.format(
+                title=course['title'],
+                time=course['time'],
+                period=course['period'].replace('\n', ''),
+                status=course['status'],
+                left_min=course['time_left'] // 60 + 2,
+                left_sec=course['time_left'] % 60).replace('\t', ' ')
+
+        return course_info
 
     def get_attendable_courses_info(self):
 
         self.attendable_courses_info = []
-        for course in self.attendable_courses:
-            course['progress'] = self.extract_progress(course['status'])
-            course['time_left'] = self.compute_left_time(lecture_time=course['time'], progress=course['progress'])
-            self.attendable_courses_info.append( \
-                """
-                ###########################################
-                    title: {title}
-                    time: {time} Minutes
-                    period: {period}
-                    status: {status}
-                    time left: {left_min} Minutes and {left_sec} Seconds
-                ############################################
-                """.format(
-                    title=course['title'],
-                    time=course['time'],
-                    period=course['period'].replace('\n', ''),
-                    status=course['status'],
-                    left_min=course['time_left'] // 60 + 2,
-                    left_sec=course['time_left'] % 60).replace('\t', ' '))
+        for idx, course in enumerate(self.attendable_courses):
+            # self.attendable_courses_info.append( \
+            #     """
+            #     ###########################################
+            #         title: {title}
+            #         time: {time} Minutes
+            #         period: {period}
+            #         status: {status}
+            #         time left: {left_min} Minutes and {left_sec} Seconds
+            #     ############################################
+            #     """.format(
+            #         title=course['title'],
+            #         time=course['time'],
+            #         period=course['period'].replace('\n', ''),
+            #         status=course['status'],
+            #         left_min=course['time_left'] // 60 + 2,
+            #         left_sec=course['time_left'] % 60).replace('\t', ' '))
+            self.attendable_courses_info.append(self.get_course_info(idx))
 
     def attend_course(self, course_idx):
         # self.course = self.courses[course_idx]
